@@ -1,5 +1,7 @@
 package com.itranswarp.warpdb.context;
 
+import com.itranswarp.warpdb.entity.BaseEntity;
+
 /**
  * UserContext holds current user in current thread.
  * 
@@ -15,9 +17,9 @@ package com.itranswarp.warpdb.context;
  * 
  * @author michael
  */
-public class UserContext<T extends DbUser> implements AutoCloseable {
+public class UserContext<T extends BaseEntity> implements AutoCloseable {
 
-	static final ThreadLocal<DbUser> current = new ThreadLocal<DbUser>();
+	static final ThreadLocal<BaseEntity> current = new ThreadLocal<BaseEntity>();
 
 	public UserContext(T user) {
 		current.set(user);
@@ -29,11 +31,11 @@ public class UserContext<T extends DbUser> implements AutoCloseable {
 	 * @return User object.
 	 */
 	public static String getRequiredCurrentUserId() {
-		DbUser user = current.get();
+		BaseEntity user = current.get();
 		if (user == null) {
 			throw new MissingContextException();
 		}
-		return user.getId();
+		return user.id;
 	}
 
 	/**
@@ -42,8 +44,8 @@ public class UserContext<T extends DbUser> implements AutoCloseable {
 	 * @return User object.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends DbUser> T getRequiredCurrentUser() {
-		DbUser user = current.get();
+	public static <T extends BaseEntity> T getRequiredCurrentUser() {
+		BaseEntity user = current.get();
 		if (user == null) {
 			throw new MissingContextException();
 		}
@@ -56,7 +58,7 @@ public class UserContext<T extends DbUser> implements AutoCloseable {
 	 * @return User object or null.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends DbUser> T getCurrentUser() {
+	public static <T extends BaseEntity> T getCurrentUser() {
 		return (T) current.get();
 	}
 
