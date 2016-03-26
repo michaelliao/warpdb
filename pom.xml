@@ -48,7 +48,6 @@
 		<javax.annotation.version>1.2</javax.annotation.version>
 		<jpa.version>2.1.1</jpa.version>
 		<junit.version>4.12</junit.version>
-		<mysql.connector.version>5.1.36</mysql.connector.version>
 		<spring.version>4.1.7.RELEASE</spring.version>
 	</properties>
 
@@ -72,12 +71,6 @@
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
 			<version>${c3p0.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql.connector.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -14,8 +14,6 @@ import org.hibernate.dialect.HSQLDialect;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import com.mysql.jdbc.StringUtils;
-
 /**
  * Create a in-memory hsqldb and return JdbcTemplate.
  * 
@@ -33,7 +31,7 @@ public class JdbcTemplateHsqldbFactory {
 			Connection conn = dataSource.getConnection();
 			Statement stmt = conn.createStatement();
 			for (String sql : sqls) {
-				if (!StringUtils.isEmptyOrWhitespaceOnly(sql)) {
+				if (sql != null && !sql.trim().isEmpty()) {
 					log.info("Execute SQL: " + sql.trim());
 					// hsqldb do not support text, mediumtext:
 					stmt.executeUpdate(sql.trim().replace("mediumtext", "longvarchar").replace("text", "longvarchar"));
