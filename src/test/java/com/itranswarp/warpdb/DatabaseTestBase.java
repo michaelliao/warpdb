@@ -10,9 +10,10 @@ public class DatabaseTestBase {
 
 	@Before
 	public void setUpDatabase() {
-		database = new Database(new SqlObjectConverters(),
-				Arrays.asList("com.itranswarp.warpdb.entity", "com.itranswarp.warpdb.test"));
-		database.jdbcTemplate = JdbcTemplateHsqldbFactory.createJdbcTemplate();
+		database = new Database();
+		database.setBasePackages(Arrays.asList("com.itranswarp.warpdb.entity", "com.itranswarp.warpdb.test"));
+		database.setJdbcTemplate(JdbcTemplateHsqldbFactory.createJdbcTemplate());
+		database.init();
 	}
 
 }

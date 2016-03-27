@@ -37,15 +37,30 @@ import com.itranswarp.warpdb.entity.BaseEntity;
  */
 public class Database {
 
+	final Log log = LogFactory.getLog(getClass());
+
 	JdbcTemplate jdbcTemplate;
 
-	final SqlObjectConverters converters;
+	SqlObjectConverters converters = new SqlObjectConverters();
 
-	final Log log = LogFactory.getLog(getClass());
-	final Map<String, Mapper<?>> mapping;
+	List<String> basePackages;
+
+	private Map<String, Mapper<?>> mapping;
+
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	public void setConverters(SqlObjectConverters converters) {
+		this.converters = converters;
+	}
+
+	public void setBasePackages(List<String> basePackages) {
+		this.basePackages = basePackages;
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Database(SqlObjectConverters converters, List<String> basePackages) {
+	public void init() {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		for (String basePackage : basePackages) {
 			classes.addAll(new ClassUtil().scan(basePackage, c -> {
@@ -63,7 +78,6 @@ public class Database {
 			map.put(name, new Mapper(clazz, converters));
 		}
 		this.mapping = map;
-		this.converters = converters;
 	}
 
 	/**
