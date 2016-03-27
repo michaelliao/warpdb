@@ -1,5 +1,6 @@
 package com.itranswarp.warpdb;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -13,10 +14,20 @@ public class DDLGenerator {
 
 	final Log log = LogFactory.getLog(getClass());
 
-	public void export(String basePackage, Class<?> dialect, String outputFile) {
-		List<Class<?>> classes = new ClassUtil().scan(basePackage, c -> {
-			return c.isAnnotationPresent(Entity.class);
-		});
+	public void export(List<String> basePackages, Class<?> dialect, String outputFile) {
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		for (String basePackage : basePackages) {
+			List<Class<?>> scanned = new ClassUtil().scan(basePackage, c -> {
+				return c.isAnnotationPresent(Entity.class);
+			});
+			for (Class<?> cls : scanned) {
+				if (isAdded(classes, cls)) {
+					log.warn("Duplicate class found: " + cls.getName());
+				} else {
+					classes.add(cls);
+				}
+			}
+		}
 		Configuration cfg = new Configuration();
 		cfg.setProperty("hibernate.hbm2ddl.auto", "create");
 		cfg.setProperty("hibernate.dialect", dialect.getName());
@@ -30,4 +41,12 @@ public class DDLGenerator {
 		log.info("DDL script was successfully exported to file: " + outputFile);
 	}
 
+	boolean isAdded(List<Class<?>> list, Class<?> test) {
+		for (Class<?> cls : list) {
+			if (cls.getName().equals(test.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Arrays;
 
 import javax.sql.DataSource;
 
@@ -54,7 +55,7 @@ public class JdbcTemplateHsqldbFactory {
 		File file = new File(".").getAbsoluteFile();
 		String schemaOutput = file.getCanonicalPath() + File.separator + "target" + File.separator + "ddl4test.sql";
 		DDLGenerator generator = new DDLGenerator();
-		generator.export("com.itranswarp.warpdb", HSQLDialect.class, schemaOutput);
+		generator.export(Arrays.asList("com.itranswarp.warpdb.test"), HSQLDialect.class, schemaOutput);
 		// read file:
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new FileReader(schemaOutput))) {
