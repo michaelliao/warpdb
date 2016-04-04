@@ -96,10 +96,9 @@ public class Database {
 		return t;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T extends BaseEntity> T fetch(Class<T> clazz, String id) {
 		String name = clazz.getSimpleName();
-		Mapper<T> mapper = (Mapper<T>) this.mapping.get(name.toLowerCase());
+		Mapper<T> mapper = getMapper(clazz);
 		String sql = "select * from " + name + " where id=?";
 		log.info("SQL: " + sql);
 		List<T> list = (List<T>) jdbcTemplate.query(sql, new Object[] { id }, mapper.rowMapper);
@@ -255,7 +254,14 @@ public class Database {
 
 	public <T extends BaseEntity> List<T> list(String sql, Object... args) {
 		log.info("SQL: " + sql);
-		Mapper<T> mapper = getEntity(sql);
+		Mapper<T> mapper = getMapper(sql);
+		List<T> results = (List<T>) jdbcTemplate.query(sql, args, mapper.rowMapper);
+		return Collections.unmodifiableList(results);
+	}
+
+	public <T extends BaseEntity> List<T> list(Class<T> clazz, String sql, Object... args) {
+		log.info("SQL: " + sql);
+		Mapper<T> mapper = getMapper(clazz);
 		List<T> results = (List<T>) jdbcTemplate.query(sql, args, mapper.rowMapper);
 		return Collections.unmodifiableList(results);
 	}
@@ -295,7 +301,13 @@ public class Database {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends BaseEntity> Mapper<T> getEntity(String sql) {
+	<T extends BaseEntity> Mapper<T> getMapper(Class<T> clazz) {
+		String name = clazz.getSimpleName();
+		return (Mapper<T>) this.mapping.get(name.toLowerCase());
+	}
+
+	@SuppressWarnings("unchecked")
+	<T extends BaseEntity> Mapper<T> getMapper(String sql) {
 		String[] ss = sql.split("\\s+");
 		for (int i = 0; i < ss.length; i++) {
 			if (ss[i].toLowerCase().equals("from")) {
