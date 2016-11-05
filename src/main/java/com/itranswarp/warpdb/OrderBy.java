@@ -3,6 +3,13 @@ package com.itranswarp.warpdb;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * select ... from ... ORDER BY ...
+ * 
+ * @author liaoxuefeng
+ * 
+ * @param <T>
+ */
 public final class OrderBy<T> extends CriteriaQuery<T> {
 
 	public OrderBy(Criteria<T> criteria, String orderBy) {

@@ -2,6 +2,13 @@ package com.itranswarp.warpdb;
 
 import java.util.List;
 
+/**
+ * select ... FROM ...
+ * 
+ * @author liaoxuefeng
+ *
+ * @param <T>
+ */
 public final class From<T> extends CriteriaQuery<T> {
 
 	From(Criteria<T> criteria, Class<T> clazz, String table) {

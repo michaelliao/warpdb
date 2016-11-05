@@ -1,5 +1,10 @@
 package com.itranswarp.warpdb;
 
+/**
+ * select DISTINCT ... from ...
+ * 
+ * @author liaoxuefeng
+ */
 @SuppressWarnings("rawtypes")
 public final class Distinct extends CriteriaQuery {
 

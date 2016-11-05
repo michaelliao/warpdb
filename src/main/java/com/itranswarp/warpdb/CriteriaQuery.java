@@ -1,5 +1,12 @@
 package com.itranswarp.warpdb;
 
+/**
+ * Base criteria query.
+ * 
+ * @author liaoxuefeng
+ * 
+ * @param <T>
+ */
 abstract class CriteriaQuery<T> {
 
 	protected final Criteria<T> criteria;

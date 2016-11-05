@@ -2,6 +2,11 @@ package com.itranswarp.warpdb;
 
 import javax.persistence.PersistenceException;
 
+/**
+ * Thrown when invalid configuration found.
+ * 
+ * @author liaoxuefeng
+ */
 public class ConfigurationException extends PersistenceException {
 
 	public ConfigurationException() {

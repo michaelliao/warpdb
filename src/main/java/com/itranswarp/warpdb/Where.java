@@ -3,6 +3,13 @@ package com.itranswarp.warpdb;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * select ... from ... WHERE ...
+ * 
+ * @author liaoxuefeng
+ * 
+ * @param <T>
+ */
 public final class Where<T> extends CriteriaQuery<T> {
 
 	Where(Criteria<T> criteria, String clause, Object... params) {

@@ -2,6 +2,11 @@ package com.itranswarp.warpdb;
 
 import java.util.Arrays;
 
+/**
+ * SELECT ... from ...
+ * 
+ * @author liaoxuefeng
+ */
 @SuppressWarnings("rawtypes")
 public final class Select extends CriteriaQuery {
 

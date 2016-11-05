@@ -2,6 +2,13 @@ package com.itranswarp.warpdb;
 
 import java.util.List;
 
+/**
+ * select ... from ... LIMIT ?, ?
+ * 
+ * @author liaoxuefeng
+ *
+ * @param <T>
+ */
 public final class Limit<T> extends CriteriaQuery<T> {
 
 	Limit(Criteria<T> criteria, int offset, int maxResults) {

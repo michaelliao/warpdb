@@ -20,6 +20,7 @@ final class Criteria<T> {
 	static final Log log = LogFactory.getLog(Criteria.class);
 
 	final WarpDb warpdb;
+
 	Class<T> clazz;
 	List<String> select = null;
 	boolean distinct = false;
