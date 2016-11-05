@@ -1,4 +1,4 @@
-package com.itranswarp.warpdb;
+package com.itranswarp.warpdb.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class DDLGenerator {
 	public void export(List<String> basePackages, Class<?> dialect, String outputFile) {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		for (String basePackage : basePackages) {
-			List<Class<?>> scanned = new ClassUtil().scan(basePackage, c -> {
+			List<Class<?>> scanned = ClassUtils.scan(basePackage, c -> {
 				return c.isAnnotationPresent(Entity.class);
 			});
 			for (Class<?> cls : scanned) {

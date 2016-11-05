@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itranswarp.warpdb.entity.BaseEntity;
+import com.itranswarp.warpdb.util.IpUtils;
 
 /**
  * Generate a 20-char String id that composed by:
@@ -47,7 +47,7 @@ public class IdUtil {
 	}
 
 	static String getIpAsString() {
-		int ip = IpUtil.ipAddrToInt(IpUtil.getIpAddress());
+		int ip = IpUtils.ipAddrToInt(IpUtils.getIpAddress());
 		log.info("Get IP address: " + Integer.toHexString(ip));
 		return intToBase32(ip & 0x3fffffff);
 	}
@@ -76,10 +76,10 @@ public class IdUtil {
 	 * @return true if it is a 20-char id.
 	 */
 	public static boolean isValidId(String s) {
-		if (s == null || s.length() != BaseEntity.ID_LENGTH) {
+		if (s == null || s.length() != 20) {
 			return false;
 		}
-		for (int i = 0; i < BaseEntity.ID_LENGTH; i++) {
+		for (int i = 0; i < 20; i++) {
 			char ch = s.charAt(i);
 			if (ch >= 'a' && ch <= 'v') {
 				continue;

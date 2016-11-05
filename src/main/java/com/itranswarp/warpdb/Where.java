@@ -3,16 +3,12 @@ package com.itranswarp.warpdb;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.itranswarp.warpdb.entity.BaseEntity;
+public final class Where<T> extends CriteriaQuery<T> {
 
-public final class Where<T extends BaseEntity> {
-
-	final SelectInfo<T> info;
-
-	Where(SelectInfo<T> info, String clause, Object... params) {
-		this.info = info;
-		info.where = new ArrayList<String>();
-		info.whereParams = new ArrayList<Object>();
+	Where(Criteria<T> criteria, String clause, Object... params) {
+		super(criteria);
+		this.criteria.where = new ArrayList<String>();
+		this.criteria.whereParams = new ArrayList<Object>();
 		append(null, clause, params);
 	}
 
@@ -28,17 +24,25 @@ public final class Where<T extends BaseEntity> {
 
 	Where<T> append(String type, String clause, Object... params) {
 		if (type != null) {
-			info.where.add(type);
+			this.criteria.where.add(type);
 		}
-		info.where.add(clause);
+		this.criteria.where.add(clause);
 		for (Object param : params) {
-			info.whereParams.add(param);
+			this.criteria.whereParams.add(param);
 		}
 		return this;
 	}
 
+	public Limit<T> limit(int maxResults) {
+		return limit(0, maxResults);
+	}
+
+	public Limit<T> limit(int offset, int maxResults) {
+		return new Limit<>(this.criteria, offset, maxResults);
+	}
+
 	public OrderBy<T> orderBy(String orderBy) {
-		return new OrderBy<T>(this.info, orderBy);
+		return new OrderBy<T>(this.criteria, orderBy);
 	}
 
 	/**
@@ -47,7 +51,7 @@ public final class Where<T extends BaseEntity> {
 	 * @return list.
 	 */
 	public List<T> list() {
-		return info.list();
+		return this.criteria.list();
 	}
 
 	/**
@@ -58,7 +62,7 @@ public final class Where<T extends BaseEntity> {
 	 * @return pagedResults
 	 */
 	public PagedResults<T> list(int pageIndex) {
-		return info.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
+		return this.criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
 	}
 
 	/**
@@ -71,7 +75,7 @@ public final class Where<T extends BaseEntity> {
 	 * @return pagedResults
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
-		return info.list(pageIndex, itemsPerPage);
+		return this.criteria.list(pageIndex, itemsPerPage);
 	}
 
 	/**
@@ -80,7 +84,7 @@ public final class Where<T extends BaseEntity> {
 	 * @return count
 	 */
 	public int count() {
-		return info.count();
+		return this.criteria.count();
 	}
 
 	/**
@@ -89,7 +93,7 @@ public final class Where<T extends BaseEntity> {
 	 * @return first model instance
 	 */
 	public T first() {
-		return info.first();
+		return this.criteria.first();
 	}
 
 	/**
@@ -99,6 +103,6 @@ public final class Where<T extends BaseEntity> {
 	 * @return modelInstance
 	 */
 	public T unique() {
-		return info.unique();
+		return this.criteria.unique();
 	}
 }

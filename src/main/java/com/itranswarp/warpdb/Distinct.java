@@ -1,20 +1,12 @@
 package com.itranswarp.warpdb;
 
-import java.util.Arrays;
-
 @SuppressWarnings("rawtypes")
-public final class Select extends CriteriaQuery {
+public final class Distinct extends CriteriaQuery {
 
 	@SuppressWarnings("unchecked")
-	Select(Criteria criteria, String... selectFields) {
+	Distinct(Criteria<?> criteria) {
 		super(criteria);
-		if (selectFields.length > 0) {
-			this.criteria.select = Arrays.asList(selectFields);
-		}
-	}
-
-	public Distinct distinct() {
-		return new Distinct(this.criteria);
+		criteria.distinct = true;
 	}
 
 	@SuppressWarnings("unchecked")

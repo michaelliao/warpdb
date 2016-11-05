@@ -1,4 +1,4 @@
-package com.itranswarp.warpdb;
+package com.itranswarp.warpdb.util;
 
 import static org.junit.Assert.*;
 
@@ -11,12 +11,11 @@ import org.junit.Test;
 
 import com.itranswarp.warpdb.context.UserContext;
 
-public class ClassUtilTest {
+public class ClassUtilsTest {
 
 	@Test
 	public void testScanInDir() throws Exception {
-		ClassUtil cs = new ClassUtil();
-		List<Class<?>> list = cs.scan("com.itranswarp.warpdb.context", c -> {
+		List<Class<?>> list = ClassUtils.scan("com.itranswarp.warpdb.context", c -> {
 			return c.getSimpleName().equals("UserContext");
 		});
 		assertEquals(1, list.size());
@@ -25,8 +24,7 @@ public class ClassUtilTest {
 
 	@Test
 	public void testScanInJar() {
-		ClassUtil cs = new ClassUtil();
-		List<Class<?>> list = cs.scan("org.apache.commons", c -> {
+		List<Class<?>> list = ClassUtils.scan("org.apache.commons", c -> {
 			return c.getName().startsWith("org.apache.commons.logging.Log");
 		});
 		assertTrue(list.size() >= 3);

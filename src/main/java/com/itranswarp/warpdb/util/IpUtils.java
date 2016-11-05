@@ -1,4 +1,4 @@
-package com.itranswarp.warpdb;
+package com.itranswarp.warpdb.util;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -8,13 +8,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * IpUtil to get IP address.
+ * IpUtils to get IP address.
  * 
  * @author michael
  */
-class IpUtil {
+public class IpUtils {
 
-	static final Log log = LogFactory.getLog(IpUtil.class);
+	static final Log log = LogFactory.getLog(IpUtils.class);
 
 	static final String IP = getIpAddress();
 

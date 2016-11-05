@@ -2,22 +2,28 @@ package com.itranswarp.warpdb;
 
 import java.util.List;
 
-import com.itranswarp.warpdb.entity.BaseEntity;
+public final class From<T> extends CriteriaQuery<T> {
 
-public final class From<T extends BaseEntity> {
-
-	final SelectInfo<T> info;
-
-	From(Database database, Class<T> clazz) {
-		this.info = new SelectInfo<T>(database, clazz);
+	From(Criteria<T> criteria, Class<T> clazz, String table) {
+		super(criteria);
+		this.criteria.clazz = clazz;
+		this.criteria.table = table;
 	}
 
 	public Where<T> where(String clause, Object... args) {
-		return new Where<T>(this.info, clause, args);
+		return new Where<T>(this.criteria, clause, args);
 	}
 
 	public OrderBy<T> orderBy(String orderBy) {
-		return new OrderBy<T>(this.info, orderBy);
+		return new OrderBy<T>(this.criteria, orderBy);
+	}
+
+	public Limit<T> limit(int maxResults) {
+		return limit(0, maxResults);
+	}
+
+	public Limit<T> limit(int offset, int maxResults) {
+		return new Limit<>(this.criteria, offset, maxResults);
 	}
 
 	/**
@@ -26,7 +32,7 @@ public final class From<T extends BaseEntity> {
 	 * @return list.
 	 */
 	public List<T> list() {
-		return info.list();
+		return criteria.list();
 	}
 
 	/**
@@ -36,7 +42,7 @@ public final class From<T extends BaseEntity> {
 	 * @return pageResult
 	 */
 	public PagedResults<T> list(int pageIndex) {
-		return info.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
+		return criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
 	}
 
 	/**
@@ -47,7 +53,7 @@ public final class From<T extends BaseEntity> {
 	 * @return
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
-		return info.list(pageIndex, itemsPerPage);
+		return criteria.list(pageIndex, itemsPerPage);
 	}
 
 	/**
@@ -56,14 +62,14 @@ public final class From<T extends BaseEntity> {
 	 * @return int count
 	 */
 	public int count() {
-		return info.count();
+		return criteria.count();
 	}
 
 	/**
 	 * Get first row of the query, or null if no result found.
 	 */
 	public T first() {
-		return info.first();
+		return criteria.first();
 	}
 
 	/**
@@ -73,6 +79,6 @@ public final class From<T extends BaseEntity> {
 	 * @return T modelInstance
 	 */
 	public T unique() {
-		return info.unique();
+		return criteria.unique();
 	}
 }

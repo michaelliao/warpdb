@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Test;
 
-import com.itranswarp.warpdb.entity.BaseEntity;
-
 public class IdUtilTest {
 
 	@Test
@@ -70,7 +68,7 @@ public class IdUtilTest {
 		for (int i = 0; i < COUNT; i++) {
 			String id = IdUtil.next();
 			// check length:
-			assertEquals(BaseEntity.ID_LENGTH, id.length());
+			assertEquals(20, id.length());
 			// check 'xxxxxxx-IP-xxx':
 			assertTrue(id.substring(9).startsWith(IdUtil.IP));
 			// check 'timestamp-xxx-xxxx':

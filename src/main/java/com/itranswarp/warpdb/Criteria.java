@@ -7,28 +7,37 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itranswarp.warpdb.entity.BaseEntity;
+/**
+ * Hold criteria query information.
+ * 
+ * @author Michael Liao
+ * 
+ * @param <T>
+ *            Entity type.
+ */
+final class Criteria<T> {
 
-final class SelectInfo<T extends BaseEntity> {
+	static final Log log = LogFactory.getLog(Criteria.class);
 
-	static final Log log = LogFactory.getLog(SelectInfo.class);
-
-	final Database database;
-	final Class<T> clazz;
+	final WarpDb warpdb;
+	Class<T> clazz;
+	List<String> select = null;
+	boolean distinct = false;
+	String table = null;
 	List<String> where = null;
 	List<Object> whereParams = null;
 	List<String> orderBy = null;
 	int offset = 0;
 	int maxResults = 0;
 
-	SelectInfo(Database database, Class<T> clazz) {
-		this.database = database;
-		this.clazz = clazz;
+	Criteria(WarpDb db) {
+		this.warpdb = db;
 	}
 
 	String sql(String aggregate) {
 		StringBuilder sb = new StringBuilder(128);
-		sb.append("SELECT ").append(aggregate == null ? "*" : aggregate).append(" FROM ").append(clazz.getSimpleName());
+		sb.append("SELECT ").append(aggregate == null ? (select == null ? "*" : String.join(", ", select)) : aggregate)
+				.append(" FROM ").append(clazz.getSimpleName());
 		if (where != null) {
 			sb.append(" WHERE ").append(String.join(" ", where));
 		}
@@ -50,7 +59,7 @@ final class SelectInfo<T extends BaseEntity> {
 				if (obj == null) {
 					params.add(null);
 				} else {
-					params.add(database.converters.javaObjectToSqlObject(obj.getClass(), obj));
+					params.add(warpdb.converters.javaObjectToSqlObject(obj.getClass(), obj));
 				}
 			}
 		}
@@ -64,13 +73,13 @@ final class SelectInfo<T extends BaseEntity> {
 	List<T> list() {
 		String selectSql = sql(null);
 		Object[] selectParams = params(null);
-		return database.list(selectSql, selectParams);
+		return warpdb.list(selectSql, selectParams);
 	}
 
 	PagedResults<T> list(int pageIndex, int itemsPerPage) {
 		String countSql = sql("count(id)");
 		Object[] countParams = params("count(id)");
-		int totalItems = database.queryForInt(countSql, countParams);
+		int totalItems = warpdb.queryForInt(countSql, countParams);
 		int totalPages = 0;
 		if (totalItems > 0) {
 			totalPages = totalItems / itemsPerPage + (totalItems % itemsPerPage > 0 ? 1 : 0);
@@ -83,13 +92,13 @@ final class SelectInfo<T extends BaseEntity> {
 		this.maxResults = itemsPerPage;
 		String selectSql = sql(null);
 		Object[] selectParams = params(null);
-		return new PagedResults<T>(page, database.list(selectSql, selectParams));
+		return new PagedResults<T>(page, warpdb.list(selectSql, selectParams));
 	}
 
 	int count() {
 		String selectSql = sql("count(id)");
 		Object[] selectParams = params("count(id)");
-		return database.queryForInt(selectSql, selectParams);
+		return warpdb.queryForInt(selectSql, selectParams);
 	}
 
 	T first() {
@@ -97,7 +106,7 @@ final class SelectInfo<T extends BaseEntity> {
 		this.maxResults = 1;
 		String selectSql = sql(null);
 		Object[] selectParams = params(null);
-		List<T> list = database.list(selectSql, selectParams);
+		List<T> list = warpdb.list(selectSql, selectParams);
 		if (list.isEmpty()) {
 			return null;
 		}
@@ -109,7 +118,7 @@ final class SelectInfo<T extends BaseEntity> {
 		this.maxResults = 2;
 		String selectSql = sql(null);
 		Object[] selectParams = params(null);
-		List<T> list = database.list(selectSql, selectParams);
+		List<T> list = warpdb.list(selectSql, selectParams);
 		if (list.isEmpty()) {
 			throw new RuntimeException("Expected unique row but nothing found.");
 		}

@@ -15,6 +15,8 @@ import org.hibernate.dialect.HSQLDialect;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import com.itranswarp.warpdb.util.DDLGenerator;
+
 /**
  * Create a in-memory hsqldb and return JdbcTemplate.
  * 

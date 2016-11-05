@@ -1,4 +1,4 @@
-package com.itranswarp.warpdb;
+package com.itranswarp.warpdb.util;
 
 import java.io.File;
 import java.net.URL;
@@ -12,14 +12,21 @@ import java.util.jar.JarFile;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class ClassUtil {
+public final class ClassUtils {
 
-	final Log log = LogFactory.getLog(getClass());
+	static final Log log = LogFactory.getLog(ClassUtils.class);
 
-	public List<Class<?>> scan(String basePackage, Predicate<Class<?>> predicate) {
+	/**
+	 * Scan classes that match the predicate.
+	 * 
+	 * @param basePackage
+	 * @param predicate
+	 * @return
+	 */
+	public static List<Class<?>> scan(String basePackage, Predicate<Class<?>> predicate) {
 		List<Class<?>> classes = new ArrayList<Class<?>>(100);
 		try {
-			this.loadClasses(basePackage, classes, predicate);
+			loadClasses(basePackage, classes, predicate);
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -28,8 +35,9 @@ class ClassUtil {
 		return classes;
 	}
 
-	void loadClasses(String basePackage, List<Class<?>> classes, Predicate<Class<?>> predicate) throws Exception {
-		ClassLoader cl = getClass().getClassLoader();
+	static void loadClasses(String basePackage, List<Class<?>> classes, Predicate<Class<?>> predicate)
+			throws Exception {
+		ClassLoader cl = ClassUtils.class.getClassLoader();
 		Enumeration<URL> resources = cl.getResources(basePackage.replace('.', '/'));
 		while (resources.hasMoreElements()) {
 			String url = resources.nextElement().toString();
@@ -45,7 +53,7 @@ class ClassUtil {
 		}
 	}
 
-	void loadClassesInDir(File dir, String basePackage, List<Class<?>> classes, Predicate<Class<?>> predicate)
+	static void loadClassesInDir(File dir, String basePackage, List<Class<?>> classes, Predicate<Class<?>> predicate)
 			throws Exception {
 		log.debug("Scan classes in dir: " + dir.getAbsolutePath());
 		String[] subs = dir.list();
@@ -64,8 +72,8 @@ class ClassUtil {
 		}
 	}
 
-	void loadClassesInJar(File jarFile, String basePackage, List<Class<?>> classes, Predicate<Class<?>> predicate)
-			throws Exception {
+	static void loadClassesInJar(File jarFile, String basePackage, List<Class<?>> classes,
+			Predicate<Class<?>> predicate) throws Exception {
 		log.info("Scan classes in jar: " + jarFile.getCanonicalPath());
 		try (JarFile jar = new JarFile(jarFile.getCanonicalPath())) {
 			Enumeration<JarEntry> e = jar.entries();
@@ -83,10 +91,11 @@ class ClassUtil {
 		}
 	}
 
-	Class<?> tryLoadClass(String name) throws ClassNotFoundException {
+	static Class<?> tryLoadClass(String name) throws ClassNotFoundException {
 		try {
 			return Class.forName(name);
 		} catch (NoClassDefFoundError e) {
+			log.warn("Failed to load class: " + name);
 			return null;
 		}
 	}

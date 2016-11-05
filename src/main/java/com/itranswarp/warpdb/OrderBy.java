@@ -3,22 +3,31 @@ package com.itranswarp.warpdb;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.itranswarp.warpdb.entity.BaseEntity;
+public final class OrderBy<T> extends CriteriaQuery<T> {
 
-public final class OrderBy<T extends BaseEntity> {
-
-	final SelectInfo<T> info;
-
-	public OrderBy(SelectInfo<T> info, String orderBy) {
-		this.info = info;
+	public OrderBy(Criteria<T> criteria, String orderBy) {
+		super(criteria);
 		orderBy(orderBy);
 	}
 
 	public OrderBy<T> orderBy(String orderBy) {
-		if (info.orderBy == null) {
-			info.orderBy = new ArrayList<String>();
+		if (criteria.orderBy == null) {
+			criteria.orderBy = new ArrayList<>();
 		}
-		info.orderBy.add(orderBy);
+		criteria.orderBy.add(orderBy);
+		return this;
+	}
+
+	/**
+	 * Make a desc order by.
+	 */
+	public OrderBy<T> desc() {
+		int last = this.criteria.orderBy.size() - 1;
+		String s = criteria.orderBy.get(last);
+		if (!s.toUpperCase().endsWith(" DESC")) {
+			s = s + " DESC";
+		}
+		criteria.orderBy.set(last, s);
 		return this;
 	}
 
@@ -27,7 +36,7 @@ public final class OrderBy<T extends BaseEntity> {
 	}
 
 	public Limit<T> limit(int offset, int maxResults) {
-		return new Limit<T>(this.info, offset, maxResults);
+		return new Limit<>(this.criteria, offset, maxResults);
 	}
 
 	/**
@@ -36,7 +45,7 @@ public final class OrderBy<T extends BaseEntity> {
 	 * @return list.
 	 */
 	public List<T> list() {
-		return info.list();
+		return criteria.list();
 	}
 
 	/**
@@ -46,7 +55,7 @@ public final class OrderBy<T extends BaseEntity> {
 	 * @return pagedResults
 	 */
 	public PagedResults<T> list(int pageIndex) {
-		return info.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
+		return criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
 	}
 
 	/**
@@ -57,13 +66,13 @@ public final class OrderBy<T extends BaseEntity> {
 	 * @return pagedResults
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
-		return info.list(pageIndex, itemsPerPage);
+		return criteria.list(pageIndex, itemsPerPage);
 	}
 
 	/**
 	 * Get first row of the query, or null if no result found.
 	 */
 	public T first() {
-		return info.first();
+		return criteria.first();
 	}
 }
