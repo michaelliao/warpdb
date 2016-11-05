@@ -60,7 +60,7 @@ final class Criteria<T> {
 				if (obj == null) {
 					params.add(null);
 				} else {
-					params.add(warpdb.converters.javaObjectToSqlObject(obj.getClass(), obj));
+					params.add(obj);
 				}
 			}
 		}

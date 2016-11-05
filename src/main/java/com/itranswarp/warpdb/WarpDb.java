@@ -37,8 +37,6 @@ public class WarpDb {
 
 	JdbcTemplate jdbcTemplate;
 
-	SqlObjectConverters converters = new SqlObjectConverters();
-
 	List<String> basePackages;
 
 	// class -> Mapper:
@@ -52,10 +50,6 @@ public class WarpDb {
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
-	}
-
-	public void setConverters(SqlObjectConverters converters) {
-		this.converters = converters;
 	}
 
 	public void setBasePackages(List<String> basePackages) {
