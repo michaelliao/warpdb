@@ -46,7 +46,6 @@
 		<!-- artifact version -->
 		<c3p0.version>0.9.1.2</c3p0.version>
 		<commons.logging.version>1.1</commons.logging.version>
-		<hibernate.entitymanager.version>4.3.10.Final</hibernate.entitymanager.version>
 		<hsqldb.version>2.3.3</hsqldb.version>
 		<javax.annotation.version>1.2</javax.annotation.version>
 		<jpa.version>2.1.1</jpa.version>
@@ -86,12 +85,6 @@
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 			<version>${hsqldb.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.entitymanager.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
