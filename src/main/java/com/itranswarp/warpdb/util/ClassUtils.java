@@ -34,7 +34,7 @@ public final class ClassUtils {
 	 * 
 	 * @param basePackage
 	 * @param predicate
-	 * @return
+	 * @return List of classes.
 	 */
 	public static List<Class<?>> scan(String basePackage, Predicate<Class<?>> predicate) {
 		List<Class<?>> classes = new ArrayList<Class<?>>(100);
