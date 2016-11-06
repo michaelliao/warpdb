@@ -8,6 +8,7 @@ import java.util.List;
  * @author liaoxuefeng
  *
  * @param <T>
+ *            Generic type.
  */
 public final class Limit<T> extends CriteriaQuery<T> {
 
@@ -26,6 +27,8 @@ public final class Limit<T> extends CriteriaQuery<T> {
 	/**
 	 * Get all results as list.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @return list.
 	 */
 	public List<T> list() {

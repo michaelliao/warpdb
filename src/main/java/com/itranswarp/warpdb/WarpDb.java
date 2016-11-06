@@ -28,6 +28,8 @@ import com.itranswarp.warpdb.util.ClassUtils;
 
 /**
  * A Spring-JdbcTemplate wrapper.
+ * 
+ * @author Michael
  */
 public class WarpDb {
 
@@ -82,9 +84,13 @@ public class WarpDb {
 	 * Get a model instance by class type and id. EntityNotFoundException is
 	 * thrown if not found.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param clazz
+	 *            Entity class.
 	 * @param id
-	 * @return modelInstance
+	 *            Id value.
+	 * @return Entity bean found by id.
 	 */
 	public <T> T get(Class<T> clazz, Serializable id) {
 		T t = fetch(clazz, id);
@@ -97,9 +103,13 @@ public class WarpDb {
 	/**
 	 * Get a model instance by class type and id. Return null if not found.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param clazz
+	 *            Entity class.
 	 * @param id
-	 * @return modelInstance
+	 *            Id value.
+	 * @return Entity bean found by id.
 	 */
 	public <T> T fetch(Class<T> clazz, Serializable id) {
 		Mapper<T> mapper = getMapper(clazz);
@@ -238,9 +248,12 @@ public class WarpDb {
 	 * Get list of entity.
 	 * 
 	 * @param clazz
+	 *            Entity class.
 	 * @param sql
+	 *            Raw SQL.
 	 * @param args
-	 * @return
+	 *            Arguments.
+	 * @return List of entities.
 	 */
 	public <T> List<T> list(Class<T> clazz, String sql, Object... args) {
 		log.info("SQL: " + sql);

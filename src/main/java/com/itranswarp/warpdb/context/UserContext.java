@@ -23,11 +23,6 @@ public class UserContext<T> implements AutoCloseable {
 		current.set(user);
 	}
 
-	/**
-	 * Return current user, or throw exception if no user signed in.
-	 * 
-	 * @return User object.
-	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getRequiredCurrentUser() {
 		Object user = current.get();
@@ -37,11 +32,6 @@ public class UserContext<T> implements AutoCloseable {
 		return (T) user;
 	}
 
-	/**
-	 * Return current user, or null if no user signed in.
-	 * 
-	 * @return User object or null.
-	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getCurrentUser() {
 		return (T) current.get();

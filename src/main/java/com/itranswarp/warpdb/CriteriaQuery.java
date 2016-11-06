@@ -3,9 +3,10 @@ package com.itranswarp.warpdb;
 /**
  * Base criteria query.
  * 
- * @author liaoxuefeng
+ * @author Michael
  * 
  * @param <T>
+ *            Generic type.
  */
 abstract class CriteriaQuery<T> {
 

@@ -19,6 +19,13 @@ public final class ClassUtils {
 
 	static final Log log = LogFactory.getLog(ClassUtils.class);
 
+	/**
+	 * Scan @Entity classes in base packages.
+	 * 
+	 * @param basePackages
+	 *            base package names.
+	 * @return List of entity class.
+	 */
 	public static List<Class<?>> scanEntities(String... basePackages) {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		for (String basePackage : basePackages) {
@@ -33,7 +40,9 @@ public final class ClassUtils {
 	 * Scan classes that match the predicate.
 	 * 
 	 * @param basePackage
+	 *            Base package name.
 	 * @param predicate
+	 *            Filter condition.
 	 * @return List of classes.
 	 */
 	public static List<Class<?>> scan(String basePackage, Predicate<Class<?>> predicate) {

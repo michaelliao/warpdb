@@ -8,6 +8,7 @@ import java.util.List;
  * @author liaoxuefeng
  *
  * @param <T>
+ *            Generic type.
  */
 public final class From<T> extends CriteriaQuery<T> {
 
@@ -20,6 +21,8 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Add where clause.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param clause
 	 *            clause like "name = ?".
 	 * @param args
@@ -45,6 +48,8 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Get all results as list.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @return list.
 	 */
 	public List<T> list() {
