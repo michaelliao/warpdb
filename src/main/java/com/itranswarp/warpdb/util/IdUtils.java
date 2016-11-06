@@ -57,7 +57,7 @@ public class IdUtils {
 	 * Is string a valid 15-char id.
 	 * 
 	 * @param s
-	 *            String.
+	 *            Id string.
 	 * @return true if it is a 15-char id.
 	 */
 	public static boolean isValidId(String s) {

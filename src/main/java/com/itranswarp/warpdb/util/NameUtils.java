@@ -2,12 +2,24 @@ package com.itranswarp.warpdb.util;
 
 public class NameUtils {
 
-	// HelloWorld -> helloWorld
+	/**
+	 * to camel case name. e.g. "HelloWorld" -> "helloWorld.
+	 * 
+	 * @param name
+	 *            Name starts with upper case.
+	 * @return Camel case name.
+	 */
 	public static String toCamelCaseName(String name) {
 		return Character.toLowerCase(name.charAt(0)) + name.substring(1);
 	}
 
-	// HelloWorld -> hello_world
+	/**
+	 * To underscore name. e.g. "HelloWorld" -> "hello_world".
+	 * 
+	 * @param name
+	 *            Name without underscore.
+	 * @return Underscore name.
+	 */
 	public static String toUnderscoreName(String name) {
 		StringBuilder sb = new StringBuilder(name.length() + 5);
 		for (int i = 0; i < name.length(); i++) {

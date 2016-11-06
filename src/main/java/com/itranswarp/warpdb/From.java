@@ -17,6 +17,15 @@ public final class From<T> extends CriteriaQuery<T> {
 		this.criteria.table = table;
 	}
 
+	/**
+	 * Add where clause.
+	 * 
+	 * @param clause
+	 *            clause like "name = ?".
+	 * @param args
+	 *            Arguments to match clause.
+	 * @return CriteriaQuery object.
+	 */
 	public Where<T> where(String clause, Object... args) {
 		return new Where<T>(this.criteria, clause, args);
 	}
