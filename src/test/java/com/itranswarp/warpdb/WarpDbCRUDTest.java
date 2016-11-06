@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.itranswarp.warpdb.test.User;
 
-public class WarpDbTest extends WarpDbTestBase {
+public class WarpDbCRUDTest extends WarpDbTestBase {
 
 	@Test
 	public void testInsert() throws Exception {
@@ -78,16 +78,27 @@ public class WarpDbTest extends WarpDbTestBase {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testUpdatePropertiesFailed() throws Exception {
+	public void testUpdatePropertiesFailedForNonUpdatable() throws Exception {
 		User user = new User();
 		user.name = "Michael";
 		user.email = "michael@somewhere.org";
 		warpdb.save(user);
-		Thread.sleep(100);
 		user.name = "Changed";
 		user.version = 99;
 		// createdAt is not updatable:
 		warpdb.updateProperties(user, "name", "version", "createdAt");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testUpdatePropertiesFailedForNonExist() throws Exception {
+		User user = new User();
+		user.name = "Michael";
+		user.email = "michael@somewhere.org";
+		warpdb.save(user);
+		user.name = "Changed";
+		user.version = 99;
+		// role is not exist:
+		warpdb.updateProperties(user, "name", "version", "role");
 	}
 
 	@Test

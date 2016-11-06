@@ -1,6 +1,7 @@
 package com.itranswarp.warpdb.util;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -9,12 +10,24 @@ import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.persistence.Entity;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public final class ClassUtils {
 
 	static final Log log = LogFactory.getLog(ClassUtils.class);
+
+	public static List<Class<?>> scanEntities(String... basePackages) {
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		for (String basePackage : basePackages) {
+			classes.addAll(ClassUtils.scan(basePackage, c -> {
+				return c.isAnnotationPresent(Entity.class);
+			}));
+		}
+		return classes;
+	}
 
 	/**
 	 * Scan classes that match the predicate.
@@ -97,6 +110,22 @@ public final class ClassUtils {
 		} catch (NoClassDefFoundError e) {
 			log.warn("Failed to load class: " + name);
 			return null;
+		}
+	}
+
+	public static List<Type> getGenericInterfacesIncludeHierarchy(Class<?> clazz) {
+		List<Type> list = new ArrayList<>();
+		addGenericInterfaces(clazz, list);
+		return list;
+	}
+
+	static void addGenericInterfaces(Class<?> clazz, List<Type> list) {
+		Type[] types = clazz.getGenericInterfaces();
+		for (Type type : types) {
+			list.add(type);
+		}
+		if (clazz.getSuperclass() != Object.class) {
+			addGenericInterfaces(clazz.getSuperclass(), list);
 		}
 	}
 }

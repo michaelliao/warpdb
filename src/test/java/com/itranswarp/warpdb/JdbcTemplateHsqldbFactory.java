@@ -1,8 +1,5 @@
 package com.itranswarp.warpdb;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -11,11 +8,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.dialect.HSQLDialect;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
-import com.itranswarp.warpdb.util.DDLGenerator;
 
 /**
  * Create a in-memory hsqldb and return JdbcTemplate.
@@ -28,7 +22,7 @@ public class JdbcTemplateHsqldbFactory {
 
 	public static JdbcTemplate createJdbcTemplate() {
 		try {
-			DataSource dataSource = new DriverManagerDataSource("jdbc:hsqldb:mem:testdb", "SA", "");
+			DataSource dataSource = new DriverManagerDataSource("jdbc:hsqldb:mem:" + getDbName(), "SA", "");
 			// init database:
 			String[] sqls = generateDDL().split(";");
 			Connection conn = dataSource.getConnection();
@@ -36,8 +30,9 @@ public class JdbcTemplateHsqldbFactory {
 			for (String sql : sqls) {
 				if (sql != null && !sql.trim().isEmpty()) {
 					log.info("Execute SQL: " + sql.trim());
-					// hsqldb do not support text, mediumtext:
-					stmt.executeUpdate(sql.trim().replace("mediumtext", "longvarchar").replace("text", "longvarchar"));
+					// hsqldb do not support text, mediumtext, longtext:
+					stmt.executeUpdate(sql.trim().toLowerCase().replace(" longtext ", " longvarchar ")
+							.replace(" mediumtext ", " longvarchar ").replace(" text ", " longvarchar "));
 				}
 			}
 			stmt.close();
@@ -48,28 +43,23 @@ public class JdbcTemplateHsqldbFactory {
 		}
 	}
 
-	static String ddl = null;
+	private static String getDbName() {
+		dbindex++;
+		return "testdb" + dbindex;
+	}
 
 	static String generateDDL() throws Exception {
-		if (ddl != null) {
-			return ddl;
+		if (ddl == null) {
+			WarpDb warpdb = new WarpDb();
+			warpdb.setBasePackages(Arrays.asList("com.itranswarp.warpdb.test"));
+			warpdb.init();
+			return warpdb.exportSchema();
 		}
-		File file = new File(".").getAbsoluteFile();
-		String schemaOutput = file.getCanonicalPath() + File.separator + "target" + File.separator + "ddl4test.sql";
-		DDLGenerator generator = new DDLGenerator();
-		generator.export(Arrays.asList("com.itranswarp.warpdb.test"), HSQLDialect.class, schemaOutput);
-		// read file:
-		StringBuilder sb = new StringBuilder();
-		try (BufferedReader reader = new BufferedReader(new FileReader(schemaOutput))) {
-			for (;;) {
-				String line = reader.readLine();
-				if (line == null) {
-					break;
-				}
-				sb.append(line);
-			}
-		}
-		ddl = sb.toString();
 		return ddl;
 	}
+
+	static int dbindex = 0;
+
+	static String ddl = null;
+
 }

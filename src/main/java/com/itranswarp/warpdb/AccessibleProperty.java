@@ -1,14 +1,19 @@
 package com.itranswarp.warpdb;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +24,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Version;
+
+import com.itranswarp.warpdb.util.ClassUtils;
 
 /**
  * Represent a bean property.
@@ -50,6 +57,8 @@ class AccessibleProperty {
 
 	// setter function:
 	final PropertySetter setter;
+
+	final boolean nullable;
 
 	boolean isId() {
 		return this.accessible.isAnnotationPresent(Id.class);
@@ -104,13 +113,34 @@ class AccessibleProperty {
 			PropertySetter setter) {
 		accessible.setAccessible(true);
 		this.accessible = accessible;
-		this.propertyType = checkPropertyType(type);
+		this.nullable = isNullable();
 		this.converter = getConverter(accessible);
+		this.propertyType = checkPropertyType(type);
 		this.propertyName = propertyName;
 		this.columnName = getColumnName(accessible, propertyName);
-		this.columnDefinition = getColumnDefinition(accessible, propertyType);
-		this.getter = getter;
-		this.setter = setter;
+		Class<?> ddlType = getConverterType();
+		if (ddlType == null) {
+			ddlType = propertyType;
+		}
+		this.columnDefinition = getColumnDefinition(accessible, ddlType);
+		this.getter = (bean) -> {
+			Object value = getter.get(bean);
+			return this.converter == null ? value : this.converter.convertToDatabaseColumn(value);
+		};
+		this.setter = (bean, value) -> {
+			if (this.converter != null) {
+				value = this.converter.convertToEntityAttribute(value);
+			}
+			setter.set(bean, value);
+		};
+	}
+
+	private boolean isNullable() {
+		if (isId()) {
+			return false;
+		}
+		Column col = this.accessible.getAnnotation(Column.class);
+		return col == null || col.nullable();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -118,24 +148,50 @@ class AccessibleProperty {
 		Convert converter = accessible.getAnnotation(Convert.class);
 		if (converter != null) {
 			Class<?> converterClass = converter.converter();
-			if (!converterClass.isAssignableFrom(AttributeConverter.class)) {
+			if (!AttributeConverter.class.isAssignableFrom(converterClass)) {
 				throw new RuntimeException(
 						"Converter class must be AttributeConverter rather than " + converterClass.getName());
 			}
 			try {
-				return (AttributeConverter<Object, Object>) converterClass.newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
+				Constructor<?> cs = converterClass.getDeclaredConstructor();
+				cs.setAccessible(true);
+				return (AttributeConverter<Object, Object>) cs.newInstance();
+			} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
+					| InvocationTargetException e) {
 				throw new RuntimeException("Cannot instantiate Converter: " + converterClass.getName(), e);
 			}
 		}
 		return null;
 	}
 
-	private static Class<?> checkPropertyType(Class<?> type) {
-		if (DEFAULT_COLUMN_TYPES.containsKey(type)) {
-			return type;
+	Class<?> getConverterType() {
+		if (this.converter != null) {
+			List<Type> types = ClassUtils.getGenericInterfacesIncludeHierarchy(this.converter.getClass());
+			for (Type type : types) {
+				if (type instanceof ParameterizedType) {
+					ParameterizedType pt = (ParameterizedType) type;
+					if (pt.getRawType() == AttributeConverter.class) {
+						Type dbType = pt.getActualTypeArguments()[1];
+						if (dbType instanceof Class) {
+							return (Class<?>) dbType;
+						}
+					}
+				}
+
+			}
 		}
-		throw new RuntimeException("Unsupported type: " + type);
+		return null;
+	}
+
+	private Class<?> checkPropertyType(Class<?> typeClass) {
+		Class<?> converterType = getConverterType();
+		if (converterType != null) {
+			typeClass = converterType;
+		}
+		if (DEFAULT_COLUMN_TYPES.containsKey(typeClass)) {
+			return typeClass;
+		}
+		throw new RuntimeException("Unsupported type: " + typeClass);
 	}
 
 	private static String getColumnName(AccessibleObject ao, String defaultName) {

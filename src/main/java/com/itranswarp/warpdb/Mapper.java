@@ -25,7 +25,7 @@ import javax.persistence.Transient;
 
 import com.itranswarp.warpdb.util.NameUtils;
 
-class Mapper<T> {
+final class Mapper<T> {
 
 	final Class<T> entityClass;
 	final String tableName;
@@ -138,6 +138,17 @@ class Mapper<T> {
 		this.postPersist = findListener(methods, PostPersist.class);
 		this.postUpdate = findListener(methods, PostUpdate.class);
 		this.postRemove = findListener(methods, PostRemove.class);
+	}
+
+	public String ddl() {
+		StringBuilder sb = new StringBuilder(256);
+		sb.append("CREATE TABLE ").append(this.tableName).append(" (\n");
+		sb.append(String.join(",\n", this.properties.stream().map((p) -> {
+			return "  " + p.columnName + " " + p.columnDefinition + (p.nullable ? " NULL" : " NOT NULL");
+		}).toArray(String[]::new)));
+		sb.append(",\n  PRIMARY KEY (").append(this.id.columnName).append(")\n");
+		sb.append(");");
+		return sb.toString();
 	}
 
 	Map<String, AccessibleProperty> buildPropertiesMap(List<AccessibleProperty> props) {

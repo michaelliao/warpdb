@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.Entity;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -58,12 +56,8 @@ public class WarpDb {
 
 	@PostConstruct
 	public void init() {
-		List<Class<?>> classes = new ArrayList<Class<?>>();
-		for (String basePackage : basePackages) {
-			classes.addAll(ClassUtils.scan(basePackage, c -> {
-				return c.isAnnotationPresent(Entity.class);
-			}));
-		}
+		List<Class<?>> classes = ClassUtils
+				.scanEntities(this.basePackages.toArray(new String[this.basePackages.size()]));
 		Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();
 		Map<String, Mapper<?>> tableMapping = new HashMap<>();
 		for (Class<?> clazz : classes) {
@@ -76,6 +70,12 @@ public class WarpDb {
 		}
 		this.classMapping = classMapping;
 		this.tableMapping = tableMapping;
+	}
+
+	public String exportSchema() {
+		return String.join("\n\n", this.tableMapping.values().stream().map((mapper) -> {
+			return mapper.ddl();
+		}).toArray(String[]::new));
 	}
 
 	/**
