@@ -8,7 +8,7 @@ import javax.persistence.MappedSuperclass;
 public abstract class AbstractEntity {
 
 	@Id
-	@Column(length = 50, nullable = false, updatable = false)
+	@Column(length = 50, nullable = false)
 	public String id;
 
 	public Long createdAt;

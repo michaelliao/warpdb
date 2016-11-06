@@ -25,6 +25,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
+import com.itranswarp.warpdb.converter.EnumToStringConverter;
 import com.itranswarp.warpdb.util.ClassUtils;
 
 /**
@@ -57,6 +58,12 @@ class AccessibleProperty {
 
 	// setter function:
 	final PropertySetter setter;
+
+	// getter and do convert if necessary:
+	final PropertyGetter convertGetter;
+
+	// setter and do convert if necessary:
+	final PropertySetter convertSetter;
 
 	final boolean nullable;
 
@@ -109,26 +116,44 @@ class AccessibleProperty {
 		});
 	}
 
-	private AccessibleProperty(Class<?> type, String propertyName, AccessibleObject accessible, PropertyGetter getter,
-			PropertySetter setter) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private AccessibleProperty(final Class<?> type, final String propertyName, final AccessibleObject accessible,
+			final PropertyGetter getter, final PropertySetter setter) {
 		accessible.setAccessible(true);
 		this.accessible = accessible;
-		this.nullable = isNullable();
-		this.converter = getConverter(accessible);
-		this.propertyType = checkPropertyType(type);
-		this.propertyName = propertyName;
-		this.columnName = getColumnName(accessible, propertyName);
-		Class<?> ddlType = getConverterType();
-		if (ddlType == null) {
-			ddlType = propertyType;
+		// check:
+		AttributeConverter<Object, Object> converter = getConverter(accessible);
+		String columnDefinition = null;
+		if (converter == null && type.isEnum()) {
+			converter = new EnumToStringConverter(type);
+			columnDefinition = "VARCHAR(50)";
 		}
-		this.columnDefinition = getColumnDefinition(accessible, ddlType);
-		this.getter = (bean) -> {
+		final Class<?> propertyType = checkPropertyType(type, converter);
+		final String columnName = getColumnName(accessible, propertyName);
+		if (columnDefinition == null) {
+			Class<?> ddlType = getConverterType(converter);
+			if (ddlType == null) {
+				ddlType = propertyType;
+			}
+			columnDefinition = getColumnDefinition(accessible, ddlType);
+		} // init:
+		this.nullable = isNullable();
+		this.converter = converter;
+		this.propertyType = propertyType;
+		this.propertyName = propertyName;
+		this.columnName = columnName;
+		this.columnDefinition = columnDefinition;
+		this.getter = getter;
+		this.convertGetter = (bean) -> {
 			Object value = getter.get(bean);
-			return this.converter == null ? value : this.converter.convertToDatabaseColumn(value);
+			if (value != null && this.converter != null) {
+				value = this.converter.convertToDatabaseColumn(value);
+			}
+			return value;
 		};
-		this.setter = (bean, value) -> {
-			if (this.converter != null) {
+		this.setter = setter;
+		this.convertSetter = (bean, value) -> {
+			if (value != null && this.converter != null) {
 				value = this.converter.convertToEntityAttribute(value);
 			}
 			setter.set(bean, value);
@@ -164,9 +189,9 @@ class AccessibleProperty {
 		return null;
 	}
 
-	Class<?> getConverterType() {
-		if (this.converter != null) {
-			List<Type> types = ClassUtils.getGenericInterfacesIncludeHierarchy(this.converter.getClass());
+	private static Class<?> getConverterType(AttributeConverter<Object, Object> converter) {
+		if (converter != null) {
+			List<Type> types = ClassUtils.getGenericInterfacesIncludeHierarchy(converter.getClass());
 			for (Type type : types) {
 				if (type instanceof ParameterizedType) {
 					ParameterizedType pt = (ParameterizedType) type;
@@ -183,12 +208,12 @@ class AccessibleProperty {
 		return null;
 	}
 
-	private Class<?> checkPropertyType(Class<?> typeClass) {
-		Class<?> converterType = getConverterType();
+	private static Class<?> checkPropertyType(Class<?> typeClass, AttributeConverter<Object, Object> converter) {
+		Class<?> converterType = getConverterType(converter);
 		if (converterType != null) {
 			typeClass = converterType;
 		}
-		if (DEFAULT_COLUMN_TYPES.containsKey(typeClass)) {
+		if (typeClass.isEnum() || DEFAULT_COLUMN_TYPES.containsKey(typeClass)) {
 			return typeClass;
 		}
 		throw new RuntimeException("Unsupported type: " + typeClass);
@@ -204,10 +229,17 @@ class AccessibleProperty {
 
 	private static String getColumnDefinition(AccessibleObject ao, Class<?> type) {
 		Column col = ao.getAnnotation(Column.class);
+		String colDef = null;
 		if (col == null || col.columnDefinition().isEmpty()) {
-			return getDefaultColumnType(type, col);
+			if (type.isEnum()) {
+				colDef = "VARCHAR(50)";
+			} else {
+				colDef = getDefaultColumnType(type, col);
+			}
+		} else {
+			colDef = col.columnDefinition().toUpperCase();
 		}
-		return col.columnDefinition();
+		return colDef;
 	}
 
 	private static String getDefaultColumnType(Class<?> type, Column col) {

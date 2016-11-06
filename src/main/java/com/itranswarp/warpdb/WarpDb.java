@@ -123,7 +123,7 @@ public class WarpDb {
 				Mapper<?> mapper = getMapper(bean.getClass());
 				mapper.preRemove.invoke(bean);
 				log.info("SQL: " + mapper.deleteSQL);
-				jdbcTemplate.update(mapper.deleteSQL, mapper.id.getter.get(bean));
+				jdbcTemplate.update(mapper.deleteSQL, mapper.id.convertGetter.get(bean));
 				mapper.postRemove.invoke(bean);
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -149,7 +149,7 @@ public class WarpDb {
 				Object[] args = new Object[mapper.updatableProperties.size() + 1];
 				int n = 0;
 				for (AccessibleProperty prop : mapper.updatableProperties) {
-					args[n] = prop.getter.get(bean);
+					args[n] = prop.convertGetter.get(bean);
 					n++;
 				}
 				args[n] = mapper.id.getter.get(bean);
@@ -180,7 +180,7 @@ public class WarpDb {
 					throw new IllegalArgumentException("Property " + prop + " not exist or un-updatable.");
 				}
 				sb.append(ap.columnName).append(" = ?, ");
-				args[n] = ap.getter.get(bean);
+				args[n] = ap.convertGetter.get(bean);
 				n++;
 			}
 			args[n] = mapper.id.getter.get(bean);
@@ -203,10 +203,11 @@ public class WarpDb {
 				Object[] args = new Object[mapper.insertableProperties.size()];
 				int n = 0;
 				for (AccessibleProperty prop : mapper.insertableProperties) {
-					args[n] = prop.getter.get(bean);
+					args[n] = prop.convertGetter.get(bean);
 					n++;
 				}
 				log.info("SQL: " + mapper.insertSQL);
+				log.info("ARG: " + Arrays.toString(args));
 				jdbcTemplate.update(mapper.insertSQL, args);
 				mapper.postPersist.invoke(bean);
 			}
@@ -359,10 +360,7 @@ class BeanRowMapper<T> implements RowMapper<T> {
 				AccessibleProperty prop = this.mapping.get(name.toLowerCase());
 				if (prop != null) {
 					Object value = rs.getObject(i);
-					if (prop.converter != null) {
-						value = prop.converter.convertToEntityAttribute(value);
-					}
-					prop.setter.set(bean, value);
+					prop.convertSetter.set(bean, value);
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
