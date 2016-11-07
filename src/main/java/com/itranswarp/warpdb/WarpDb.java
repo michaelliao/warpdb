@@ -217,7 +217,6 @@ public class WarpDb {
 					n++;
 				}
 				log.info("SQL: " + mapper.insertSQL);
-				log.info("ARG: " + Arrays.toString(args));
 				jdbcTemplate.update(mapper.insertSQL, args);
 				mapper.postPersist.invoke(bean);
 			}
