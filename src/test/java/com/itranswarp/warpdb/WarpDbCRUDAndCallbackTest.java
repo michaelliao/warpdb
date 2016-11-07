@@ -2,6 +2,9 @@ package com.itranswarp.warpdb;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
+import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
@@ -13,7 +16,7 @@ import org.junit.Test;
 
 import com.itranswarp.warpdb.test.User;
 
-public class WarpDbCRUDTest extends WarpDbTestBase {
+public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 
 	@Test
 	public void testInsert() throws Exception {
@@ -52,6 +55,33 @@ public class WarpDbCRUDTest extends WarpDbTestBase {
 		assertEquals(user.createdAt, bak.createdAt);
 		assertEquals(user.updatedAt, bak.updatedAt);
 		assertEquals(user.version, bak.version);
+	}
+
+	@Test
+	public void testLoad() throws Exception {
+		String[] ids = { User.nextId(), User.nextId(), User.nextId(), User.nextId() };
+		for (int i = 0; i < ids.length; i++) {
+			User user = new User();
+			user.id = ids[i];
+			user.name = "Mr No." + i;
+			user.email = "no." + i + "@somewhere.org";
+			warpdb.save(user);
+		}
+		// test get & fetch:
+		User u1 = warpdb.get(User.class, ids[0]);
+		assertTrue(u1.callbacks.contains(PostLoad.class));
+		User u2 = warpdb.fetch(User.class, ids[1]);
+		assertTrue(u2.callbacks.contains(PostLoad.class));
+		// test list:
+		List<User> us = warpdb.list(User.class, "SELECT * FROM User where id>?", ids[1]);
+		assertEquals(2, us.size());
+		assertTrue(us.get(0).callbacks.contains(PostLoad.class));
+		assertTrue(us.get(1).callbacks.contains(PostLoad.class));
+		// test criteria:
+		List<User> users = warpdb.from(User.class).where("id>?", ids[1]).list();
+		assertEquals(2, users.size());
+		assertTrue(users.get(0).callbacks.contains(PostLoad.class));
+		assertTrue(users.get(1).callbacks.contains(PostLoad.class));
 	}
 
 	@Test

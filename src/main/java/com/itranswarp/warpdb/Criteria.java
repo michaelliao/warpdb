@@ -37,8 +37,16 @@ final class Criteria<T> {
 
 	String sql(String aggregate) {
 		StringBuilder sb = new StringBuilder(128);
-		sb.append("SELECT ").append(aggregate == null ? (select == null ? "*" : String.join(", ", select)) : aggregate)
-				.append(" FROM ").append(clazz.getSimpleName());
+		sb.append("SELECT ");
+		if (aggregate == null) {
+			if (distinct) {
+				sb.append("DISTINCT ");
+			}
+			sb.append((select == null ? "*" : String.join(", ", select)));
+		} else {
+			sb.append(aggregate);
+		}
+		sb.append(" FROM ").append(clazz.getSimpleName());
 		if (where != null) {
 			sb.append(" WHERE ").append(String.join(" ", where));
 		}

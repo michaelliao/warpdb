@@ -25,6 +25,8 @@ public class User extends BaseEntity {
 
 	@Transient
 	public String fullName;
+	
+	public String tag;
 
 	@Transient
 	public List<Class<?>> callbacks = new ArrayList<>();

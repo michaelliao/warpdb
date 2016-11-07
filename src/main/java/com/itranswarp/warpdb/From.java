@@ -30,6 +30,15 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * @return CriteriaQuery object.
 	 */
 	public Where<T> where(String clause, Object... args) {
+		int n = 0;
+		for (int i = 0; i < clause.length(); i++) {
+			if (clause.charAt(i) == '?') {
+				n++;
+			}
+		}
+		if (n != args.length) {
+			throw new IllegalArgumentException("Arguments not match the placeholder.");
+		}
 		return new Where<T>(this.criteria, clause, args);
 	}
 
