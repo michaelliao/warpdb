@@ -86,6 +86,12 @@ final class Criteria<T> {
 	}
 
 	PagedResults<T> list(int pageIndex, int itemsPerPage) {
+		if (pageIndex < 1) {
+			throw new IllegalArgumentException("Invalid page index.");
+		}
+		if (itemsPerPage < 1 || itemsPerPage > 1000) {
+			throw new IllegalArgumentException("Invalid items per page.");
+		}
 		String countSql = sql("count(id)");
 		Object[] countParams = params("count(id)");
 		int totalItems = warpdb.queryForInt(countSql, countParams);
