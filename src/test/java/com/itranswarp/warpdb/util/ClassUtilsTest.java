@@ -9,17 +9,17 @@ import org.apache.commons.logging.LogConfigurationException;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import com.itranswarp.warpdb.context.UserContext;
+import com.itranswarp.warpdb.converter.EnumToStringConverter;
 
 public class ClassUtilsTest {
 
 	@Test
 	public void testScanInDir() throws Exception {
-		List<Class<?>> list = ClassUtils.scan("com.itranswarp.warpdb.context", c -> {
-			return c.getSimpleName().equals("UserContext");
+		List<Class<?>> list = ClassUtils.scan("com.itranswarp.warpdb.converter", c -> {
+			return c.getSimpleName().equals("EnumToStringConverter");
 		});
 		assertEquals(1, list.size());
-		assertEquals(UserContext.class, list.get(0));
+		assertEquals(EnumToStringConverter.class, list.get(0));
 	}
 
 	@Test
