@@ -58,7 +58,7 @@ public class User {
 
 ### Query
 
-Warpdb supports criteria query and raw sql query, both are type-safe:
+Warpdb supports criteria query and raw SQL query, both are type-safe:
 
 ```
 List<User> users = warpdb.from(User.class)
@@ -67,10 +67,33 @@ List<User> users = warpdb.from(User.class)
         .list();
 ```
 
-Using raw sql:
+Using raw SQL:
 
 ```
 List<User> users = warpdb.query("select * from User order by name limit 100");
+```
+
+### Paged Query
+
+Warpdb supports paged query by specify page index and page size:
+
+```
+// page 3, 10 items per page:
+PagedResults<User> pr = warpdb.from(User.class)
+        .orderBy("updatedAt")
+        .list(3, 10);
+System.out.println(pr.page.pageIndex); // 3
+System.out.println(pr.page.itemsPerPage); // 10
+System.out.println(pr.page.totalPages); // 92
+System.out.println(pr.page.totalItems); // 912
+List<User> list = pr.results; // current page items
+```
+
+A paged query will generate 2 SQLs when execute `list(pageIndex, pageSize)`:
+
+```
+SELECT COUNT(*) FROM User;
+SELECT * FROM User ORDER BY updatedAt limit 20, 10
 ```
 
 ### Save
