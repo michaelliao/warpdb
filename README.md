@@ -58,6 +58,16 @@ public class User {
 
 ### Query
 
+Query by primary key:
+
+```
+// get user, or throw EntityNotFoundException if not found:
+User user = warpdb.get(User.class, "123");
+
+// get user, or return null if not found:
+User another = warpdb.fetch(User.class, "456");
+```
+
 Warpdb supports criteria query and raw SQL query, both are type-safe:
 
 ```
@@ -65,6 +75,15 @@ List<User> users = warpdb.from(User.class)
         .where("name=?", "bob")
         .orderBy("updatedAt").desc()
         .list();
+```
+
+Get first result or null if not found:
+
+```
+User user = warpdb.from(User.class)
+        .where("name=?", "bob")
+        .orderBy("updatedAt").desc()
+        .first();
 ```
 
 Using raw SQL:
