@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Generate a 15-char String id that composed by: "timestamp-incr".
+ * Generate a 16-char String id that composed by: "timestamp-incr".
  * 
  * @author michael
  */
@@ -17,23 +17,23 @@ public class IdUtils {
 
 	static final char[] BASE32_CHARS = "0123456789abcdefghijklmnopqrstuv".toCharArray();
 
-	static final AtomicLong sequence = new AtomicLong(System.currentTimeMillis() & 0x1ffffff);
+	static final AtomicLong sequence = new AtomicLong(System.currentTimeMillis() & 0x1fffffff);
 
 	static final Random random = new Random();
 
 	/**
-	 * Generate a 15-char String id that composed by:
+	 * Generate a 16-char String id that composed by:
 	 * 
-	 * timestamp: 9-chars; seq: 6-chars
+	 * timestamp: 9-chars; seq: 7-chars
 	 * 
-	 * @return 15-char String.
+	 * @return 16-char String.
 	 */
 	public static String next() {
 		String timestamp = longToBase32(System.currentTimeMillis());
-		String seq = longToBase32(sequence.getAndIncrement() & 0x1ffffff);
-		StringBuilder builder = new StringBuilder("000000000000000");
+		String seq = longToBase32(sequence.getAndIncrement() & 0x1fffffff);
+		StringBuilder builder = new StringBuilder("0000000000000000");
 		setStringAt(builder, 0, timestamp, 9);
-		setStringAt(builder, 9, seq, 6);
+		setStringAt(builder, 9, seq, 7);
 		return builder.toString();
 	}
 
@@ -54,14 +54,14 @@ public class IdUtils {
 	}
 
 	/**
-	 * Is string a valid 15-char id.
+	 * Is string a valid 16-char id.
 	 * 
 	 * @param s
 	 *            Id string.
-	 * @return true if it is a 15-char id.
+	 * @return true if it is a 16-char id.
 	 */
 	public static boolean isValidId(String s) {
-		if (s == null || s.length() != 15) {
+		if (s == null || s.length() != 16) {
 			return false;
 		}
 		for (int i = 0; i < 15; i++) {
