@@ -36,10 +36,15 @@ final class Mapper<T> {
 	final AccessibleProperty version;
 
 	// all properties including @Id, key is property name (NOT column name)
-	final List<AccessibleProperty> properties;
+	final List<AccessibleProperty> allProperties;
+
+	// lower-case property name -> AccessibleProperty
+	final Map<String, AccessibleProperty> allPropertiesMap;
 
 	final List<AccessibleProperty> insertableProperties;
 	final List<AccessibleProperty> updatableProperties;
+
+	// lower-case property name -> AccessibleProperty
 	final Map<String, AccessibleProperty> updatablePropertiesMap;
 
 	final BeanRowMapper<T> rowMapper;
@@ -97,7 +102,8 @@ final class Mapper<T> {
 		}
 		this.version = versions.length == 0 ? null : versions[0];
 
-		this.properties = all;
+		this.allProperties = all;
+		this.allPropertiesMap = buildPropertiesMap(this.allProperties);
 
 		this.insertableProperties = all.stream().filter((p) -> {
 			return p.isInsertable();
@@ -128,7 +134,7 @@ final class Mapper<T> {
 
 		this.deleteSQL = "DELETE FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
 
-		this.rowMapper = new BeanRowMapper<>(this.entityClass, this.properties);
+		this.rowMapper = new BeanRowMapper<>(this.entityClass, this.allProperties);
 
 		List<Method> methods = this.findMethods(clazz);
 		this.prePersist = findListener(methods, PrePersist.class);
@@ -143,7 +149,7 @@ final class Mapper<T> {
 	public String ddl() {
 		StringBuilder sb = new StringBuilder(256);
 		sb.append("CREATE TABLE ").append(this.tableName).append(" (\n");
-		sb.append(String.join(",\n", this.properties.stream().map((p) -> {
+		sb.append(String.join(",\n", this.allProperties.stream().map((p) -> {
 			return "  " + p.columnName + " " + p.columnDefinition + (p.nullable ? " NULL" : " NOT NULL");
 		}).toArray(String[]::new)));
 		sb.append(",\n  PRIMARY KEY (").append(this.id.columnName).append(")\n");
@@ -154,7 +160,7 @@ final class Mapper<T> {
 	Map<String, AccessibleProperty> buildPropertiesMap(List<AccessibleProperty> props) {
 		Map<String, AccessibleProperty> map = new HashMap<>();
 		for (AccessibleProperty prop : props) {
-			map.put(prop.propertyName, prop);
+			map.put(prop.propertyName.toLowerCase(), prop);
 		}
 		return map;
 	}

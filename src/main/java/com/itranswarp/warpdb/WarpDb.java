@@ -95,7 +95,7 @@ public class WarpDb {
 	public <T> T get(Class<T> clazz, Serializable id) {
 		T t = fetch(clazz, id);
 		if (t == null) {
-			throw new EntityNotFoundException("Entity not found: " + clazz.getName());
+			throw new EntityNotFoundException(clazz.getSimpleName());
 		}
 		return t;
 	}
@@ -148,7 +148,7 @@ public class WarpDb {
 
 	public <T> From<T> from(Class<T> entityClass) {
 		Mapper<T> mapper = getMapper(entityClass);
-		return new From<>(new Criteria<>(this), entityClass, mapper.tableName);
+		return new From<>(new Criteria<>(this), mapper);
 	}
 
 	public <T> void update(@SuppressWarnings("unchecked") T... beans) {
@@ -185,7 +185,7 @@ public class WarpDb {
 			sb.append("UPDATE ").append(mapper.tableName).append(" SET ");
 			int n = 0;
 			for (String prop : properties) {
-				AccessibleProperty ap = mapper.updatablePropertiesMap.get(prop);
+				AccessibleProperty ap = mapper.updatablePropertiesMap.get(prop.toLowerCase());
 				if (ap == null) {
 					throw new IllegalArgumentException("Property " + prop + " not exist or un-updatable.");
 				}

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -64,4 +65,18 @@ public class WarpDbConverterTest extends WarpDbTestBase {
 		assertNull(bak2.address);
 	}
 
+	@Test
+	public void testConvertWhenQuery() throws Exception {
+		TodoEntity todo = new TodoEntity();
+		todo.id = TodoEntity.nextId();
+		todo.name = "Unit Test";
+		todo.targetDate = LocalDate.of(2016, 10, 20);
+		todo.targetDateTime = LocalDateTime.of(2016, 10, 20, 11, 12, 13);
+		todo.address = null;
+		warpdb.save(todo);
+		// query:
+		List<TodoEntity> list = warpdb.from(TodoEntity.class).where("targetDate>?", LocalDate.of(2016, 10, 19)).list();
+		assertEquals(1, list.size());
+		assertEquals(LocalDate.of(2016, 10, 20), list.get(0).targetDate);
+	}
 }

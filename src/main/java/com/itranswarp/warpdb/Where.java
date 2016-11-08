@@ -2,6 +2,7 @@ package com.itranswarp.warpdb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * select ... from ... WHERE ...
@@ -30,6 +31,30 @@ public final class Where<T> extends CriteriaQuery<T> {
 	}
 
 	Where<T> append(String type, String clause, Object... params) {
+		// check clause:
+		int n = 0;
+		for (int i = 0; i < clause.length(); i++) {
+			if (clause.charAt(i) == '?') {
+				n++;
+			}
+		}
+		if (n != params.length) {
+			throw new IllegalArgumentException("Arguments not match the placeholder.");
+		}
+		// convert params:
+		Mapper<T> mapper = this.criteria.mapper;
+		String[] names = extractWords(clause);
+		n = 0;
+		for (String name : names) {
+			AccessibleProperty ap = mapper.allPropertiesMap.get(name.toLowerCase());
+			if (ap != null) {
+				if (ap.converter != null) {
+					params[n] = ap.converter.convertToDatabaseColumn(params[n]);
+				}
+				n++;
+			}
+		}
+		// add:
 		if (type != null) {
 			this.criteria.where.add(type);
 		}
@@ -38,6 +63,13 @@ public final class Where<T> extends CriteriaQuery<T> {
 			this.criteria.whereParams.add(param);
 		}
 		return this;
+	}
+
+	static Pattern WORD_PATTERN = Pattern.compile("[^a-zA-Z0-9\\_]+");
+
+	static String[] extractWords(String s) {
+		String ss = WORD_PATTERN.matcher(s).replaceAll(" ");
+		return ss.split("\\s+");
 	}
 
 	public Limit<T> limit(int maxResults) {

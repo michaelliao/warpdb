@@ -16,7 +16,7 @@ public final class Distinct extends CriteriaQuery {
 
 	@SuppressWarnings("unchecked")
 	public <T> From<T> from(Class<T> entityClass) {
-		return new From<T>(this.criteria, entityClass, this.criteria.warpdb.getMapper(entityClass).tableName);
+		return new From<T>(this.criteria, this.criteria.warpdb.getMapper(entityClass));
 	}
 
 }

@@ -21,6 +21,7 @@ final class Criteria<T> {
 
 	final WarpDb warpdb;
 
+	Mapper<T> mapper;
 	Class<T> clazz;
 	List<String> select = null;
 	boolean distinct = false;
