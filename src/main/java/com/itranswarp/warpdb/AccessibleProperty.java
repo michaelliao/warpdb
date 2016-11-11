@@ -71,6 +71,18 @@ class AccessibleProperty {
 		return this.accessible.isAnnotationPresent(Id.class);
 	}
 
+	boolean isIdentityId() {
+		if (!isId()) {
+			return false;
+		}
+		GeneratedValue gv = this.accessible.getAnnotation(GeneratedValue.class);
+		if (gv == null) {
+			return false;
+		}
+		GenerationType gt = gv.strategy();
+		return gt == GenerationType.IDENTITY;
+	}
+
 	boolean isVersion() {
 		boolean isVersion = this.accessible.isAnnotationPresent(Version.class);
 		if (isVersion) {

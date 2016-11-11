@@ -3,6 +3,8 @@ package com.itranswarp.warpdb;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -22,7 +24,10 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import com.itranswarp.warpdb.util.ClassUtils;
 
@@ -217,7 +222,23 @@ public class WarpDb {
 					n++;
 				}
 				log.info("SQL: " + mapper.insertSQL);
-				jdbcTemplate.update(mapper.insertSQL, args);
+				if (mapper.id.isIdentityId()) {
+					// using identityId:
+					KeyHolder keyHolder = new GeneratedKeyHolder();
+					jdbcTemplate.update(new PreparedStatementCreator() {
+						public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+							PreparedStatement ps = connection.prepareStatement(mapper.insertSQL,
+									new String[] { mapper.id.columnName });
+							for (int i = 0; i < args.length; i++) {
+								ps.setObject(i + 1, args[i]);
+							}
+							return ps;
+						}
+					}, keyHolder);
+					mapper.id.convertSetter.set(bean, keyHolder.getKey());
+				} else {
+					jdbcTemplate.update(mapper.insertSQL, args);
+				}
 				mapper.postPersist.invoke(bean);
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {

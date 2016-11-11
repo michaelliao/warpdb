@@ -106,6 +106,9 @@ final class Mapper<T> {
 		this.allPropertiesMap = buildPropertiesMap(this.allProperties);
 
 		this.insertableProperties = all.stream().filter((p) -> {
+			if (p.isIdentityId()) {
+				return false;
+			}
 			return p.isInsertable();
 		}).collect(Collectors.toList());
 
@@ -150,10 +153,12 @@ final class Mapper<T> {
 		StringBuilder sb = new StringBuilder(256);
 		sb.append("CREATE TABLE ").append(this.tableName).append(" (\n");
 		sb.append(String.join(",\n", this.allProperties.stream().map((p) -> {
-			return "  " + p.columnName + " " + p.columnDefinition + (p.nullable ? " NULL" : " NOT NULL");
+			return "  " + p.columnName + " " + p.columnDefinition // definition
+					+ (p.nullable ? " NULL" : " NOT NULL") // nullable?
+					+ (p.isIdentityId() ? " AUTO_INCREMENT" : "") // identity
+					+ (p.isId() ? " PRIMARY KEY" : "");
 		}).toArray(String[]::new)));
-		sb.append(",\n  PRIMARY KEY (").append(this.id.columnName).append(")\n");
-		sb.append(");");
+		sb.append("\n);\n");
 		return sb.toString();
 	}
 

@@ -1,21 +1,18 @@
 package com.itranswarp.warpdb.test;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public abstract class AutoIncreamentIdEntity {
+public class AutoIncreamentEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public long id;
 
-	public Long createdAt;
+	public String name;
 
-	@Column(nullable = false)
-	public Long updatedAt;
-
+	public long createdAt;
 }

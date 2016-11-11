@@ -10,6 +10,16 @@ Build status:
 
 ### Configuration
 
+Maven dependency:
+
+```
+<dependency>
+    <groupId>com.itranswarp</groupId>
+    <artifactId>warpdb</artifactId>
+    <version>2.1</version>
+</dependency>
+```
+
 Warpdb is built on top of Spring-JDBC. JdbcTemplate or DataSource is required when build warpdb instance:
 
 ```
