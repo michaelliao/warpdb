@@ -32,14 +32,14 @@ public class CriteriaTest {
 		assertEquals("SELECT * FROM user LIMIT ?, ?", warpdb.select().from(User.class).limit(10, 100).sql());
 		assertEquals("SELECT * FROM user WHERE name = ?",
 				warpdb.select().from(User.class).where("name = ?", "Bob").sql());
-		assertEquals("SELECT * FROM user WHERE name = ? AND age > ?",
-				warpdb.select().from(User.class).where("name = ?", "Bob").and("age > ?", 10).sql());
+		assertEquals("SELECT * FROM user WHERE name = ? AND tag > ?",
+				warpdb.select().from(User.class).where("name = ?", "Bob").and("tag > ?", 10).sql());
 		assertEquals("SELECT * FROM user WHERE name = ? ORDER BY name",
 				warpdb.select().from(User.class).where("name = ?", "Bob").orderBy("name").sql());
-		assertEquals("SELECT * FROM user WHERE name = ? ORDER BY name, age",
-				warpdb.select().from(User.class).where("name = ?", "Bob").orderBy("name").orderBy("age").sql());
-		assertEquals("SELECT * FROM user WHERE name = ? ORDER BY name DESC, age",
-				warpdb.select().from(User.class).where("name = ?", "Bob").orderBy("name").desc().orderBy("age").sql());
+		assertEquals("SELECT * FROM user WHERE name = ? ORDER BY name, tag",
+				warpdb.select().from(User.class).where("name = ?", "Bob").orderBy("name").orderBy("tag").sql());
+		assertEquals("SELECT * FROM user WHERE name = ? ORDER BY name DESC, tag",
+				warpdb.select().from(User.class).where("name = ?", "Bob").orderBy("name").desc().orderBy("tag").sql());
 	}
 
 	@Test
