@@ -14,11 +14,11 @@ import com.itranswarp.warpdb.converter.LocalDateTimeConverter;
 @Entity
 public class TodoEntity extends BaseEntity {
 
-	@Column(length = 100)
+	@Column(name = "f_name", length = 100)
 	public String name;
 
 	@Convert(converter = LocalDateConverter.class)
-	@Column(columnDefinition = "date")
+	@Column(name = "f_Target_date", columnDefinition = "date")
 	public LocalDate targetDate;
 
 	@Convert(converter = LocalDateTimeConverter.class)
