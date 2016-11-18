@@ -8,6 +8,10 @@ Build status:
 
 [![Build Status](https://travis-ci.org/michaelliao/warpdb.svg?branch=master)](https://travis-ci.org/michaelliao/warpdb)
 
+### Database Support
+
+* MySQL 5.x
+
 ### Configuration
 
 Maven dependency:
@@ -16,7 +20,7 @@ Maven dependency:
 <dependency>
     <groupId>com.itranswarp</groupId>
     <artifactId>warpdb</artifactId>
-    <version>2.1</version>
+    <version>2.3</version>
 </dependency>
 ```
 
@@ -26,11 +30,11 @@ Warpdb is built on top of Spring-JDBC. JdbcTemplate or DataSource is required wh
 <bean class="com.itranswarp.warpdb.WarpDb" init-method="init">
     <property name="basePackages">
         <list>
-        	<value>com.test.product.model</value>
-        	<value>com.test.order.model</value>
+            <value>com.test.product.model</value>
+            <value>com.test.order.model</value>
         </list>
     </property>
-	<property name="jdbcTemplate" ref="jdbcTemplate" />
+    <property name="jdbcTemplate" ref="jdbcTemplate" />
 </bean>
 ```
 
@@ -40,11 +44,11 @@ Or using data source:
 <bean class="com.itranswarp.warpdb.WarpDb" init-method="init">
     <property name="basePackages">
         <list>
-        	<value>com.test.product.model</value>
-        	<value>com.test.order.model</value>
+            <value>com.test.product.model</value>
+            <value>com.test.order.model</value>
         </list>
     </property>
-	<property name="dataSource" ref="dataSource" />
+    <property name="dataSource" ref="dataSource" />
 </bean>
 ```
 
@@ -182,9 +186,9 @@ Values used in Java and db can be converted by attribute converter:
 @Entity
 public class User {
     // stored as "DATE" in db:
-	@Convert(converter = LocalDateConverter.class)
-	@Column(columnDefinition = "date")
-	public LocalDate birth;
+    @Convert(converter = LocalDateConverter.class)
+    @Column(columnDefinition = "date")
+    public LocalDate birth;
 }
 ```
 
@@ -198,7 +202,7 @@ public class User {
     @Id
     String id;
 
-	long createdAt;
+    long createdAt;
 
     @PrePersist()
     public void prePersist() {
@@ -217,3 +221,4 @@ Using `ddl()` to export schema:
 ```
 String ddl = warpdb.ddl();
 ```
+
