@@ -25,7 +25,8 @@ public class User extends BaseEntity {
 
 	@Transient
 	public String fullName;
-	
+
+	@Column(name = "the_tag")
 	public String tag;
 
 	@Transient

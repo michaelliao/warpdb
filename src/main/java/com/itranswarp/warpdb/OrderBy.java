@@ -21,8 +21,32 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 		if (criteria.orderBy == null) {
 			criteria.orderBy = new ArrayList<>();
 		}
+		orderBy = checkProperty(orderBy);
 		criteria.orderBy.add(orderBy);
 		return this;
+	}
+
+	String checkProperty(String orderBy) {
+		String prop = null;
+		String upper = orderBy.toUpperCase();
+		if (upper.endsWith(" DESC")) {
+			prop = orderBy.substring(0, orderBy.length() - 5).trim();
+			return propertyToField(prop) + " DESC";
+		} else if (upper.endsWith(" ASC")) {
+			prop = orderBy.substring(0, orderBy.length() - 4).trim();
+			return propertyToField(prop) + " ASC";
+		} else {
+			prop = orderBy.trim();
+			return propertyToField(prop);
+		}
+	}
+
+	String propertyToField(String prop) {
+		AccessibleProperty ap = this.criteria.mapper.allPropertiesMap.get(prop);
+		if (ap == null) {
+			throw new IllegalArgumentException("Invalid property when use order by: " + prop);
+		}
+		return ap.columnName;
 	}
 
 	/**
