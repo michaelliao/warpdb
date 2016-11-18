@@ -66,6 +66,7 @@ class AccessibleProperty {
 	final PropertySetter convertSetter;
 
 	final boolean nullable;
+	final boolean unique;
 
 	boolean isId() {
 		return this.accessible.isAnnotationPresent(Id.class);
@@ -150,6 +151,7 @@ class AccessibleProperty {
 			columnDefinition = getColumnDefinition(accessible, ddlType);
 		} // init:
 		this.nullable = isNullable();
+		this.unique = isUnique();
 		this.converter = converter;
 		this.propertyType = propertyType;
 		this.propertyName = propertyName;
@@ -178,6 +180,14 @@ class AccessibleProperty {
 		}
 		Column col = this.accessible.getAnnotation(Column.class);
 		return col == null || col.nullable();
+	}
+
+	private boolean isUnique() {
+		if (isId()) {
+			return true;
+		}
+		Column col = this.accessible.getAnnotation(Column.class);
+		return col != null && col.unique();
 	}
 
 	@SuppressWarnings("unchecked")

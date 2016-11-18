@@ -154,12 +154,52 @@ final class Mapper<T> {
 		sb.append("CREATE TABLE ").append(this.tableName).append(" (\n");
 		sb.append(String.join(",\n", this.allProperties.stream().map((p) -> {
 			return "  " + p.columnName + " " + p.columnDefinition // definition
-					+ (p.nullable ? " NULL" : " NOT NULL") // nullable?
 					+ (p.isIdentityId() ? " AUTO_INCREMENT" : "") // identity
-					+ (p.isId() ? " PRIMARY KEY" : "");
+					+ (p.nullable ? " NULL" : " NOT NULL") // nullable?
+					+ (!p.isId() && p.unique ? " UNIQUE" : ""); // unique?
 		}).toArray(String[]::new)));
-		sb.append("\n);\n");
+		sb.append(",\n");
+		// add unique key:
+		sb.append(getUniqueKey());
+		// add index:
+		sb.append(getIndex());
+		// add primary key:
+		sb.append("  PRIMARY KEY(").append(this.id.columnName).append(")\n");
+		sb.append(");\n");
 		return sb.toString();
+	}
+
+	String getUniqueKey() {
+		Table table = this.entityClass.getAnnotation(Table.class);
+		if (table != null) {
+			return Arrays.stream(table.uniqueConstraints()).map((c) -> {
+				String name = c.name().isEmpty() ? "UNI_" + String.join("_", c.columnNames()) : c.name();
+				return "  CONSTRAINT " + name + " UNIQUE (" + String.join(", ", c.columnNames()) + "),\n";
+			}).reduce("", (acc, s) -> {
+				return acc + s;
+			});
+		}
+		return "";
+	}
+
+	String getIndex() {
+		Table table = this.entityClass.getAnnotation(Table.class);
+		if (table != null) {
+			return Arrays.stream(table.indexes()).map((c) -> {
+				if (c.unique()) {
+					String name = c.name().isEmpty() ? "UNI_" + c.columnList().replace(" ", "").replace(",", "_")
+							: c.name();
+					return "  CONSTRAINT " + name + " UNIQUE (" + c.columnList() + "),\n";
+				} else {
+					String name = c.name().isEmpty() ? "IDX_" + c.columnList().replace(" ", "").replace(",", "_")
+							: c.name();
+					return "  INDEX " + name + " (" + c.columnList() + "),\n";
+				}
+			}).reduce("", (acc, s) -> {
+				return acc + s;
+			});
+		}
+		return "";
 	}
 
 	Map<String, AccessibleProperty> buildPropertiesMap(List<AccessibleProperty> props) {

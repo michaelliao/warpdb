@@ -2,12 +2,14 @@ package com.itranswarp.warpdb;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.itranswarp.warpdb.test.AutoIncreamentEntity;
 
 public class WarpDbIdentityIdTest extends WarpDbTestBase {
 
+	@Ignore
 	@Test
 	public void testInsertIdentityId() throws Exception {
 		AutoIncreamentEntity[] es = new AutoIncreamentEntity[10];

@@ -1,6 +1,8 @@
 package com.itranswarp.warpdb;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * select ... FROM ...
@@ -17,6 +19,24 @@ public final class From<T> extends CriteriaQuery<T> {
 		this.criteria.mapper = mapper;
 		this.criteria.clazz = mapper.entityClass;
 		this.criteria.table = mapper.tableName;
+		checkSelect();
+	}
+
+	void checkSelect() {
+		if (this.criteria.select == null) {
+			return;
+		}
+		Map<String, AccessibleProperty> map = criteria.mapper.allPropertiesMap;
+		this.criteria.select = this.criteria.select.stream().map((prop) -> {
+			if ("*".equals(prop)) {
+				return "*";
+			}
+			AccessibleProperty ap = map.get(prop);
+			if (ap == null) {
+				throw new IllegalArgumentException("Invalid property in select: " + prop);
+			}
+			return ap.columnName;
+		}).collect(Collectors.toList());
 	}
 
 	/**

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
@@ -12,9 +13,13 @@ import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "UNI_NameEmail", columnNames = { "name", "email" }), indexes = {
+		@Index(name = "IDX_TagId", columnList = "the_tag"), @Index(unique = true, columnList = "name, the_tag") })
 public class User extends BaseEntity {
 
 	@Column(length = 100, nullable = false)
@@ -22,6 +27,8 @@ public class User extends BaseEntity {
 
 	@Column(length = 100, unique = true, nullable = false, updatable = false)
 	public String email;
+
+	public int age;
 
 	@Transient
 	public String fullName;
