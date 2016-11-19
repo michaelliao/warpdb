@@ -31,7 +31,7 @@ public class Page {
 		if (end > totalPages) {
 			end = totalPages;
 		}
-		List<Integer> list = new ArrayList<Integer>(end - start + 3);
+		List<Integer> list = new ArrayList<>(end - start + 3);
 		if (start >= 2) {
 			list.add(1);
 		}

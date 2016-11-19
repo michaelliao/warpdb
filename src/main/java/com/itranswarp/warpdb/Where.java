@@ -23,8 +23,8 @@ public final class Where<T> extends CriteriaQuery<T> {
 
 	Where(Criteria<T> criteria, String clause, Object... params) {
 		super(criteria);
-		this.criteria.where = new ArrayList<String>();
-		this.criteria.whereParams = new ArrayList<Object>();
+		this.criteria.where = new ArrayList<>();
+		this.criteria.whereParams = new ArrayList<>();
 		append(null, clause, params);
 	}
 
@@ -80,7 +80,7 @@ public final class Where<T> extends CriteriaQuery<T> {
 	}
 
 	public OrderBy<T> orderBy(String orderBy) {
-		return new OrderBy<T>(this.criteria, orderBy);
+		return new OrderBy<>(this.criteria, orderBy);
 	}
 
 	/**

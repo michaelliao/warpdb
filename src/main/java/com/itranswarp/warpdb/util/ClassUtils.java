@@ -27,7 +27,7 @@ public final class ClassUtils {
 	 * @return List of entity class.
 	 */
 	public static List<Class<?>> scanEntities(String... basePackages) {
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		List<Class<?>> classes = new ArrayList<>();
 		for (String basePackage : basePackages) {
 			classes.addAll(ClassUtils.scan(basePackage, c -> {
 				return c.isAnnotationPresent(Entity.class);
@@ -46,7 +46,7 @@ public final class ClassUtils {
 	 * @return List of classes.
 	 */
 	public static List<Class<?>> scan(String basePackage, Predicate<Class<?>> predicate) {
-		List<Class<?>> classes = new ArrayList<Class<?>>(100);
+		List<Class<?>> classes = new ArrayList<>(100);
 		try {
 			loadClasses(basePackage, classes, predicate);
 		} catch (RuntimeException e) {

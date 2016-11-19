@@ -63,7 +63,7 @@ final class Criteria<T> {
 	}
 
 	Object[] params(String aggregate) {
-		List<Object> params = new ArrayList<Object>();
+		List<Object> params = new ArrayList<>();
 		if (where != null) {
 			for (Object obj : whereParams) {
 				if (obj == null) {
@@ -102,13 +102,13 @@ final class Criteria<T> {
 		}
 		Page page = new Page(pageIndex, itemsPerPage, totalPages, totalItems);
 		if (totalItems == 0 || pageIndex > totalPages) {
-			return new PagedResults<T>(page, Collections.emptyList());
+			return new PagedResults<>(page, Collections.emptyList());
 		}
 		this.offset = (pageIndex - 1) * itemsPerPage;
 		this.maxResults = itemsPerPage;
 		String selectSql = sql(null);
 		Object[] selectParams = params(null);
-		return new PagedResults<T>(page, warpdb.list(selectSql, selectParams));
+		return new PagedResults<>(page, warpdb.list(selectSql, selectParams));
 	}
 
 	int count() {

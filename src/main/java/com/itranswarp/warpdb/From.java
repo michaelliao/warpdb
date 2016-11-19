@@ -31,7 +31,7 @@ public final class From<T> extends CriteriaQuery<T> {
 			if ("*".equals(prop)) {
 				return "*";
 			}
-			AccessibleProperty ap = map.get(prop);
+			AccessibleProperty ap = map.get(prop.toLowerCase());
 			if (ap == null) {
 				throw new IllegalArgumentException("Invalid property in select: " + prop);
 			}
@@ -51,11 +51,11 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * @return CriteriaQuery object.
 	 */
 	public Where<T> where(String clause, Object... args) {
-		return new Where<T>(this.criteria, clause, args);
+		return new Where<>(this.criteria, clause, args);
 	}
 
 	public OrderBy<T> orderBy(String orderBy) {
-		return new OrderBy<T>(this.criteria, orderBy);
+		return new OrderBy<>(this.criteria, orderBy);
 	}
 
 	public Limit<T> limit(int maxResults) {

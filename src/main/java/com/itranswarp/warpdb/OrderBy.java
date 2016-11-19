@@ -42,7 +42,7 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	}
 
 	String propertyToField(String prop) {
-		AccessibleProperty ap = this.criteria.mapper.allPropertiesMap.get(prop);
+		AccessibleProperty ap = this.criteria.mapper.allPropertiesMap.get(prop.toLowerCase());
 		if (ap == null) {
 			throw new IllegalArgumentException("Invalid property when use order by: " + prop);
 		}
