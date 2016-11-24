@@ -8,6 +8,14 @@ Build status:
 
 [![Build Status](https://travis-ci.org/michaelliao/warpdb.svg?branch=master)](https://travis-ci.org/michaelliao/warpdb)
 
+### Design principles
+
+* JPA-annotation based configuration.
+* DSL-style API reads like English.
+* Support raw SQL for very complex query.
+* No "attach/dettach".
+* All entities are simple POJOs without proxy-ing.
+
 ### Database Support
 
 * MySQL 5.x
