@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
@@ -32,6 +33,8 @@ final class Mapper<T> {
 
 	// @Id property:
 	final AccessibleProperty id;
+	// @GeneratedValue
+	final boolean autoIncrementId;
 	// @Version property:
 	final AccessibleProperty version;
 
@@ -120,6 +123,7 @@ final class Mapper<T> {
 
 		// init:
 		this.id = ids[0];
+		this.autoIncrementId = this.id.accessible.isAnnotationPresent(GeneratedValue.class);
 		this.entityClass = clazz;
 		this.tableName = getTableName(clazz);
 
