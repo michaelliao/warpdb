@@ -30,6 +30,8 @@ public class User extends BaseEntity {
 
 	public int age;
 
+	public double score;
+
 	@Transient
 	public String fullName;
 

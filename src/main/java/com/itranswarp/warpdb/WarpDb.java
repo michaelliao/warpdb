@@ -13,6 +13,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
@@ -24,8 +27,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -326,10 +331,28 @@ public class WarpDb {
 		return list;
 	}
 
-	public int queryForInt(String sql, Object... args) {
+	public Optional<Number> queryForNumber(String sql, Object... args) {
 		log.info("SQL: " + sql);
-		Integer num = jdbcTemplate.queryForObject(sql, args, Integer.class);
-		return num.intValue();
+		Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
+		return Optional.ofNullable(number);
+	}
+
+	public OptionalLong queryForLong(String sql, Object... args) {
+		log.info("SQL: " + sql);
+		Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
+		if (number == null) {
+			return OptionalLong.empty();
+		}
+		return OptionalLong.of(number.longValue());
+	}
+
+	public OptionalInt queryForInt(String sql, Object... args) {
+		log.info("SQL: " + sql);
+		Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
+		if (number == null) {
+			return OptionalInt.empty();
+		}
+		return OptionalInt.of(number.intValue());
 	}
 
 	public <T> T unique(String sql, Object... args) {
@@ -392,6 +415,22 @@ public class WarpDb {
 		throw new RuntimeException("Cannot parse entity name from SQL: " + sql);
 	}
 
+	static final RowMapper<Number> NUMBER_ROW_MAPPER = new RowMapper<Number>() {
+		@Override
+		public Number mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return (Number) rs.getObject(1);
+		}
+	};
+
+	static final ResultSetExtractor<Number> NUMBER_RESULT_SET = new ResultSetExtractor<Number>() {
+		@Override
+		public Number extractData(ResultSet rs) throws SQLException, DataAccessException {
+			if (rs.next()) {
+				return (Number) rs.getObject(1);
+			}
+			return null;
+		}
+	};
 }
 
 class BeanRowMapper<T> implements RowMapper<T> {

@@ -95,7 +95,7 @@ final class Criteria<T> {
 		}
 		String countSql = sql("count(id)");
 		Object[] countParams = params("count(id)");
-		int totalItems = warpdb.queryForInt(countSql, countParams);
+		int totalItems = warpdb.queryForInt(countSql, countParams).getAsInt();
 		int totalPages = 0;
 		if (totalItems > 0) {
 			totalPages = totalItems / itemsPerPage + (totalItems % itemsPerPage > 0 ? 1 : 0);
@@ -114,7 +114,7 @@ final class Criteria<T> {
 	int count() {
 		String selectSql = sql("count(id)");
 		Object[] selectParams = params("count(id)");
-		return warpdb.queryForInt(selectSql, selectParams);
+		return warpdb.queryForInt(selectSql, selectParams).getAsInt();
 	}
 
 	T first() {
