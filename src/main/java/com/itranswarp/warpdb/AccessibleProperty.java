@@ -72,6 +72,7 @@ class AccessibleProperty {
 		return this.accessible.isAnnotationPresent(Id.class);
 	}
 
+	// is id && is id marked as @GeneratedValue(strategy=GenerationType.IDENTITY)
 	boolean isIdentityId() {
 		if (!isId()) {
 			return false;
@@ -95,11 +96,8 @@ class AccessibleProperty {
 	}
 
 	boolean isInsertable() {
-		if (isId()) {
-			GeneratedValue gv = this.accessible.getAnnotation(GeneratedValue.class);
-			if (gv != null && gv.strategy() == GenerationType.IDENTITY) {
-				return false;
-			}
+		if (isIdentityId()) {
+			return false;
 		}
 		Column col = this.accessible.getAnnotation(Column.class);
 		return col == null || col.insertable();

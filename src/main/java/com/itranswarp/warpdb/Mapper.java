@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.GeneratedValue;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
@@ -33,8 +32,6 @@ final class Mapper<T> {
 
 	// @Id property:
 	final AccessibleProperty id;
-	// @GeneratedValue
-	final boolean autoIncrementId;
 	// @Version property:
 	final AccessibleProperty version;
 
@@ -52,7 +49,7 @@ final class Mapper<T> {
 
 	final BeanRowMapper<T> rowMapper;
 
-	final String querySQL;
+	final String selectSQL;
 	final String insertSQL;
 	final String updateSQL;
 	final String deleteSQL;
@@ -123,11 +120,10 @@ final class Mapper<T> {
 
 		// init:
 		this.id = ids[0];
-		this.autoIncrementId = this.id.accessible.isAnnotationPresent(GeneratedValue.class);
 		this.entityClass = clazz;
 		this.tableName = getTableName(clazz);
 
-		this.querySQL = "SELECT * FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
+		this.selectSQL = "SELECT * FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
 
 		this.insertSQL = "INSERT INTO " + this.tableName + " ("
 				+ String.join(", ", this.insertableProperties.stream().map((p) -> {

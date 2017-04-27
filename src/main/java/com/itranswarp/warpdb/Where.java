@@ -64,7 +64,7 @@ public final class Where<T> extends CriteriaQuery<T> {
 		return this;
 	}
 
-	static Pattern WORD_PATTERN = Pattern.compile("[^a-zA-Z0-9\\_]+");
+	static final Pattern WORD_PATTERN = Pattern.compile("[^a-zA-Z0-9\\_]+");
 
 	static String[] extractWords(String s) {
 		String ss = WORD_PATTERN.matcher(s).replaceAll(" ");
@@ -127,8 +127,6 @@ public final class Where<T> extends CriteriaQuery<T> {
 
 	/**
 	 * Get first row of the query, or null if no result found.
-	 * 
-	 * @return first model instance
 	 */
 	public T first() {
 		return this.criteria.first();
@@ -138,7 +136,11 @@ public final class Where<T> extends CriteriaQuery<T> {
 	 * Get unique result of the query. Exception will throw if no result found
 	 * or more than 1 results found.
 	 * 
-	 * @return modelInstance
+	 * @return T modelInstance
+	 * @throws javax.persistence.NoResultException
+	 *             If result set is empty.
+	 * @throws javax.persistence.NonUniqueResultException
+	 *             If more than 1 results found.
 	 */
 	public T unique() {
 		return this.criteria.unique();

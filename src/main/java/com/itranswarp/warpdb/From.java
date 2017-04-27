@@ -26,7 +26,7 @@ public final class From<T> extends CriteriaQuery<T> {
 		if (this.criteria.select == null) {
 			return;
 		}
-		Map<String, AccessibleProperty> map = criteria.mapper.allPropertiesMap;
+		Map<String, AccessibleProperty> map = this.criteria.mapper.allPropertiesMap;
 		this.criteria.select = this.criteria.select.stream().map((prop) -> {
 			if ("*".equals(prop)) {
 				return "*";
@@ -74,7 +74,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * @return list.
 	 */
 	public List<T> list() {
-		return criteria.list();
+		return this.criteria.list();
 	}
 
 	/**
@@ -84,7 +84,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * @return pageResult
 	 */
 	public PagedResults<T> list(int pageIndex) {
-		return criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
+		return this.criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * @return
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
-		return criteria.list(pageIndex, itemsPerPage);
+		return this.criteria.list(pageIndex, itemsPerPage);
 	}
 
 	/**
@@ -104,14 +104,14 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * @return int count
 	 */
 	public int count() {
-		return criteria.count();
+		return this.criteria.count();
 	}
 
 	/**
 	 * Get first row of the query, or null if no result found.
 	 */
 	public T first() {
-		return criteria.first();
+		return this.criteria.first();
 	}
 
 	/**
@@ -119,8 +119,12 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * or more than 1 results found.
 	 * 
 	 * @return T modelInstance
+	 * @throws javax.persistence.NoResultException
+	 *             If result set is empty.
+	 * @throws javax.persistence.NonUniqueResultException
+	 *             If more than 1 results found.
 	 */
 	public T unique() {
-		return criteria.unique();
+		return this.criteria.unique();
 	}
 }

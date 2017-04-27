@@ -48,9 +48,8 @@
 		<commons.logging.version>1.1</commons.logging.version>
 		<hsqldb.version>2.3.3</hsqldb.version>
 		<javax.annotation.version>1.2</javax.annotation.version>
-		<jpa.version>2.1.1</jpa.version>
 		<junit.version>4.12</junit.version>
-		<spring.version>4.3.3.RELEASE</spring.version>
+		<spring.version>4.3.7.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
@@ -65,9 +64,9 @@
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>javax.persistence</artifactId>
-			<version>${jpa.version}</version>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.1-api</artifactId>
+			<version>1.0.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>c3p0</groupId>

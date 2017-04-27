@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +80,14 @@ public class WarpDb {
 		this.tableMapping = tableMapping;
 	}
 
+	public String getDDL(Class<?> clazz) {
+		Mapper<?> mapper = this.classMapping.get(clazz);
+		if (mapper == null) {
+			throw new PersistenceException("Cannot find entity class: " + clazz.getName());
+		}
+		return mapper.ddl();
+	}
+
 	public String exportSchema() {
 		return String.join("\n\n", this.tableMapping.values().stream().map((mapper) -> {
 			return mapper.ddl();
@@ -118,8 +127,8 @@ public class WarpDb {
 	 */
 	public <T> T fetch(Class<T> clazz, Serializable id) {
 		Mapper<T> mapper = getMapper(clazz);
-		log.info("SQL: " + mapper.querySQL);
-		List<T> list = (List<T>) jdbcTemplate.query(mapper.querySQL, new Object[] { id }, mapper.rowMapper);
+		log.info("SQL: " + mapper.selectSQL);
+		List<T> list = (List<T>) jdbcTemplate.query(mapper.selectSQL, new Object[] { id }, mapper.rowMapper);
 		if (list.isEmpty()) {
 			return null;
 		}
@@ -156,6 +165,12 @@ public class WarpDb {
 		return new From<>(new Criteria<>(this), mapper);
 	}
 
+	/**
+	 * Update entities' updatable properties by id.
+	 * 
+	 * @param beans
+	 *            Entity objects.
+	 */
 	public <T> void update(@SuppressWarnings("unchecked") T... beans) {
 		try {
 			for (T bean : beans) {
@@ -178,6 +193,14 @@ public class WarpDb {
 		}
 	}
 
+	/**
+	 * Update entity's specified properties.
+	 * 
+	 * @param bean
+	 *            Entity object.
+	 * @param properties
+	 *            Properties' names.
+	 */
 	public <T> void updateProperties(T bean, String... properties) {
 		if (properties.length == 0) {
 			throw new IllegalArgumentException("No properties provided.");
@@ -210,6 +233,12 @@ public class WarpDb {
 		}
 	}
 
+	/**
+	 * Persist entity objects.
+	 * 
+	 * @param beans
+	 *            Entity objects.
+	 */
 	public <T> void save(@SuppressWarnings("unchecked") T... beans) {
 		try {
 			for (T bean : beans) {
@@ -228,7 +257,7 @@ public class WarpDb {
 					jdbcTemplate.update(new PreparedStatementCreator() {
 						public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 							PreparedStatement ps = connection.prepareStatement(mapper.insertSQL,
-									new String[] { mapper.id.columnName });
+									Statement.RETURN_GENERATED_KEYS);
 							for (int i = 0; i < args.length; i++) {
 								ps.setObject(i + 1, args[i]);
 							}
@@ -237,6 +266,7 @@ public class WarpDb {
 					}, keyHolder);
 					mapper.id.convertSetter.set(bean, keyHolder.getKey());
 				} else {
+					// id is specified:
 					jdbcTemplate.update(mapper.insertSQL, args);
 				}
 				mapper.postPersist.invoke(bean);
@@ -246,6 +276,13 @@ public class WarpDb {
 		}
 	}
 
+	/**
+	 * Update sql.
+	 * 
+	 * @param sql
+	 * @param args
+	 * @return
+	 */
 	public int update(String sql, Object... args) {
 		return jdbcTemplate.update(sql, args);
 	}
@@ -296,7 +333,7 @@ public class WarpDb {
 	}
 
 	public <T> T unique(String sql, Object... args) {
-		if (sql.indexOf(" limit ") == (-1)) {
+		if (sql.toLowerCase().indexOf(" limit ") == (-1)) {
 			sql = sql + " limit 2";
 		}
 		List<T> list = list(sql, args);
@@ -310,7 +347,7 @@ public class WarpDb {
 	}
 
 	public <T> T fetch(String sql, Object... args) {
-		if (sql.indexOf(" limit ") == (-1)) {
+		if (sql.toLowerCase().indexOf(" limit ") == (-1)) {
 			sql = sql + " limit 2";
 		}
 		List<T> list = list(sql, args);
@@ -323,6 +360,7 @@ public class WarpDb {
 		return list.get(0);
 	}
 
+	// get mapper by class:
 	@SuppressWarnings("unchecked")
 	<T> Mapper<T> getMapper(Class<T> clazz) {
 		Mapper<T> mapper = (Mapper<T>) this.classMapping.get(clazz);
@@ -332,6 +370,7 @@ public class WarpDb {
 		return mapper;
 	}
 
+	// get Mapper from SQL like "select * from abc where ..."
 	@SuppressWarnings("unchecked")
 	<T> Mapper<T> getMapper(String sql) {
 		String[] ss = sql.split("\\s+");
