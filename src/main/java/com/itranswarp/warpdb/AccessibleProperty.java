@@ -72,7 +72,8 @@ class AccessibleProperty {
 		return this.accessible.isAnnotationPresent(Id.class);
 	}
 
-	// is id && is id marked as @GeneratedValue(strategy=GenerationType.IDENTITY)
+	// is id && is id marked as
+	// @GeneratedValue(strategy=GenerationType.IDENTITY)
 	boolean isIdentityId() {
 		if (!isId()) {
 			return false;
@@ -271,7 +272,7 @@ class AccessibleProperty {
 			int preci = col == null ? 0 : col.precision();
 			int scale = col == null ? 0 : col.scale();
 			if (preci == 0) {
-				preci = 10;
+				preci = 10; // default DECIMAL precision of MySQL
 			}
 			ddl = ddl.replace("$1", String.valueOf(preci)).replace("$2", String.valueOf(scale));
 		}

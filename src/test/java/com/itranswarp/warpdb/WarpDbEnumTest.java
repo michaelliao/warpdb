@@ -17,6 +17,9 @@ public class WarpDbEnumTest extends WarpDbTestBase {
 		ee.roleName = Role.ADMIN;
 		warpdb.save(ee);
 		// query:
+		EnumEntity bak = warpdb.fetch(EnumEntity.class, ee.id);
+		assertNotNull(bak);
+		assertEquals(Role.ADMIN, bak.roleName);
 	}
 
 	@Test
@@ -31,5 +34,4 @@ public class WarpDbEnumTest extends WarpDbTestBase {
 		assertNotNull(bak);
 		assertNull(bak.roleName);
 	}
-
 }
