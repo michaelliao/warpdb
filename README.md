@@ -28,7 +28,7 @@ Maven dependency:
 <dependency>
     <groupId>com.itranswarp</groupId>
     <artifactId>warpdb</artifactId>
-    <version>2.6</version>
+    <version>2.8</version>
 </dependency>
 ```
 

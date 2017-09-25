@@ -47,7 +47,7 @@ final class Criteria<T> {
 		} else {
 			sb.append(aggregate);
 		}
-		sb.append(" FROM ").append(clazz.getSimpleName());
+		sb.append(" FROM ").append(mapper.tableName);
 		if (where != null) {
 			sb.append(" WHERE ").append(String.join(" ", where));
 		}

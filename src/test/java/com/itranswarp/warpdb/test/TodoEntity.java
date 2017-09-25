@@ -7,11 +7,13 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import com.itranswarp.warpdb.converter.LocalDateConverter;
 import com.itranswarp.warpdb.converter.LocalDateTimeConverter;
 
 @Entity
+@Table(name = "todos")
 public class TodoEntity extends BaseEntity {
 
 	@Column(name = "f_name", length = 100)
