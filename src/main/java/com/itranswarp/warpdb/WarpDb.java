@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +131,7 @@ public class WarpDb {
 	 */
 	public <T> T fetch(Class<T> clazz, Serializable id) {
 		Mapper<T> mapper = getMapper(clazz);
-		log.info("SQL: " + mapper.selectSQL);
+		log.debug("SQL: " + mapper.selectSQL);
 		List<T> list = (List<T>) jdbcTemplate.query(mapper.selectSQL, new Object[] { id }, mapper.rowMapper);
 		if (list.isEmpty()) {
 			return null;
@@ -151,7 +150,7 @@ public class WarpDb {
 			for (Object bean : beans) {
 				Mapper<?> mapper = getMapper(bean.getClass());
 				mapper.preRemove.invoke(bean);
-				log.info("SQL: " + mapper.deleteSQL);
+				log.debug("SQL: " + mapper.deleteSQL);
 				jdbcTemplate.update(mapper.deleteSQL, mapper.id.convertGetter.get(bean));
 				mapper.postRemove.invoke(bean);
 			}
@@ -188,8 +187,7 @@ public class WarpDb {
 					n++;
 				}
 				args[n] = mapper.id.getter.get(bean);
-				log.info("SQL: " + mapper.updateSQL);
-				log.info("ARG :" + Arrays.toString(args));
+				log.debug("SQL: " + mapper.updateSQL);
 				jdbcTemplate.update(mapper.updateSQL, args);
 				mapper.postUpdate.invoke(bean);
 			}
@@ -230,7 +228,7 @@ public class WarpDb {
 			sb.delete(sb.length() - 2, sb.length());
 			sb.append(" WHERE ").append(mapper.id.columnName).append(" = ?");
 			String sql = sb.toString();
-			log.info("SQL: " + sql);
+			log.debug("SQL: " + sql);
 			jdbcTemplate.update(sql, args);
 			mapper.postUpdate.invoke(bean);
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -255,7 +253,7 @@ public class WarpDb {
 					args[n] = prop.convertGetter.get(bean);
 					n++;
 				}
-				log.info("SQL: " + mapper.insertSQL);
+				log.debug("SQL: " + mapper.insertSQL);
 				if (mapper.id.isIdentityId()) {
 					// using identityId:
 					KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -282,18 +280,29 @@ public class WarpDb {
 	}
 
 	/**
-	 * Update sql.
+	 * Execute update SQL.
 	 * 
 	 * @param sql
+	 *            The update SQL.
 	 * @param args
-	 * @return
+	 *            The arguments that match the SQL.
+	 * @return int result of update.
 	 */
 	public int update(String sql, Object... args) {
 		return jdbcTemplate.update(sql, args);
 	}
 
+	/**
+	 * Execute query.
+	 * 
+	 * @param sql
+	 *            The select SQL.
+	 * @param args
+	 *            The arguments that match the SQL.
+	 * @return List of object T.
+	 */
 	public <T> List<T> list(String sql, Object... args) {
-		log.info("SQL: " + sql);
+		log.debug("SQL: " + sql);
 		Mapper<T> mapper = getMapper(sql);
 		List<T> list = (List<T>) jdbcTemplate.query(sql, args, mapper.rowMapper);
 		try {
@@ -318,7 +327,7 @@ public class WarpDb {
 	 * @return List of entities.
 	 */
 	public <T> List<T> list(Class<T> clazz, String sql, Object... args) {
-		log.info("SQL: " + sql);
+		log.debug("SQL: " + sql);
 		Mapper<T> mapper = getMapper(clazz);
 		List<T> list = (List<T>) jdbcTemplate.query(sql, args, mapper.rowMapper);
 		try {
@@ -332,13 +341,13 @@ public class WarpDb {
 	}
 
 	public Optional<Number> queryForNumber(String sql, Object... args) {
-		log.info("SQL: " + sql);
+		log.debug("SQL: " + sql);
 		Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
 		return Optional.ofNullable(number);
 	}
 
 	public OptionalLong queryForLong(String sql, Object... args) {
-		log.info("SQL: " + sql);
+		log.debug("SQL: " + sql);
 		Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
 		if (number == null) {
 			return OptionalLong.empty();
@@ -347,7 +356,7 @@ public class WarpDb {
 	}
 
 	public OptionalInt queryForInt(String sql, Object... args) {
-		log.info("SQL: " + sql);
+		log.debug("SQL: " + sql);
 		Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
 		if (number == null) {
 			return OptionalInt.empty();

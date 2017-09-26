@@ -27,9 +27,7 @@ public final class Limit<T> extends CriteriaQuery<T> {
 	/**
 	 * Get all results as list.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @return list.
+	 * @return List of object T.
 	 */
 	public List<T> list() {
 		return criteria.list();

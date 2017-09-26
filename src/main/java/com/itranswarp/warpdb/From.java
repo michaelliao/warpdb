@@ -42,10 +42,8 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Add where clause.
 	 * 
-	 * @param <T>
-	 *            Generic type.
 	 * @param clause
-	 *            clause like "name = ?".
+	 *            Clause like "name = ?".
 	 * @param args
 	 *            Arguments to match clause.
 	 * @return CriteriaQuery object.
@@ -54,14 +52,37 @@ public final class From<T> extends CriteriaQuery<T> {
 		return new Where<>(this.criteria, clause, args);
 	}
 
+	/**
+	 * Add order by clause.
+	 * 
+	 * @param orderBy
+	 *            Field of order by.
+	 * @return CriteriaQuery object.
+	 */
 	public OrderBy<T> orderBy(String orderBy) {
 		return new OrderBy<>(this.criteria, orderBy);
 	}
 
+	/**
+	 * Add limit clause.
+	 * 
+	 * @param maxResults
+	 *            The max results.
+	 * @return CriteriaQuery object.
+	 */
 	public Limit<T> limit(int maxResults) {
 		return limit(0, maxResults);
 	}
 
+	/**
+	 * Add limit clause.
+	 * 
+	 * @param offset
+	 *            The offset.
+	 * @param maxResults
+	 *            The max results.
+	 * @return CriteriaQuery object.
+	 */
 	public Limit<T> limit(int offset, int maxResults) {
 		return new Limit<>(this.criteria, offset, maxResults);
 	}
@@ -69,9 +90,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Get all results as list.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @return list.
+	 * @return List of object T.
 	 */
 	public List<T> list() {
 		return this.criteria.list();
@@ -81,7 +100,8 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * Do page query using default items per page.
 	 * 
 	 * @param pageIndex
-	 * @return pageResult
+	 *            Page index, starts from 1.
+	 * @return pageResult PageResults object.
 	 */
 	public PagedResults<T> list(int pageIndex) {
 		return this.criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
@@ -92,7 +112,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	 * 
 	 * @param pageIndex
 	 * @param itemsPerPage
-	 * @return
+	 * @return PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
 		return this.criteria.list(pageIndex, itemsPerPage);
@@ -109,6 +129,8 @@ public final class From<T> extends CriteriaQuery<T> {
 
 	/**
 	 * Get first row of the query, or null if no result found.
+	 * 
+	 * @return Object T or null.
 	 */
 	public T first() {
 		return this.criteria.first();

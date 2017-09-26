@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Hold criteria query information.
  * 
@@ -16,8 +13,6 @@ import org.apache.commons.logging.LogFactory;
  *            Entity type.
  */
 final class Criteria<T> {
-
-	static final Log log = LogFactory.getLog(Criteria.class);
 
 	final WarpDb warpdb;
 
@@ -58,7 +53,6 @@ final class Criteria<T> {
 			sb.append(" LIMIT ?, ?");
 		}
 		String s = sb.toString();
-		log.info("SQL: " + s);
 		return s;
 	}
 

@@ -96,8 +96,8 @@ public final class Where<T> extends CriteriaQuery<T> {
 	 * Do page query using default items per page.
 	 * 
 	 * @param pageIndex
-	 *            page index
-	 * @return pagedResults
+	 *            The page index, starts from 1.
+	 * @return The PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex) {
 		return this.criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
@@ -107,10 +107,10 @@ public final class Where<T> extends CriteriaQuery<T> {
 	 * Do page query.
 	 * 
 	 * @param pageIndex
-	 *            page index
+	 *            The page index, starts from 1.
 	 * @param itemsPerPage
-	 *            per page number
-	 * @return pagedResults
+	 *            Page size.
+	 * @return The PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
 		return this.criteria.list(pageIndex, itemsPerPage);
@@ -119,7 +119,7 @@ public final class Where<T> extends CriteriaQuery<T> {
 	/**
 	 * Get count as int.
 	 * 
-	 * @return count
+	 * @return Count result.
 	 */
 	public int count() {
 		return this.criteria.count();
@@ -127,6 +127,8 @@ public final class Where<T> extends CriteriaQuery<T> {
 
 	/**
 	 * Get first row of the query, or null if no result found.
+	 * 
+	 * @return Object T or null.
 	 */
 	public T first() {
 		return this.criteria.first();

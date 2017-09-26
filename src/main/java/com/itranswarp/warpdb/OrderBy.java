@@ -51,6 +51,8 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 
 	/**
 	 * Make a desc order by.
+	 * 
+	 * @return Criteria query object.
 	 */
 	public OrderBy<T> desc() {
 		int last = this.criteria.orderBy.size() - 1;
@@ -62,10 +64,26 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 		return this;
 	}
 
+	/**
+	 * Add limit clause.
+	 * 
+	 * @param maxResults
+	 *            The max results.
+	 * @return Criteria query object.
+	 */
 	public Limit<T> limit(int maxResults) {
 		return limit(0, maxResults);
 	}
 
+	/**
+	 * Add limit clause.
+	 * 
+	 * @param offset
+	 *            Offset.
+	 * @param maxResults
+	 *            The max results.
+	 * @return Criteria query object.
+	 */
 	public Limit<T> limit(int offset, int maxResults) {
 		return new Limit<>(this.criteria, offset, maxResults);
 	}
@@ -83,7 +101,8 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	 * Do page query using default items per page.
 	 * 
 	 * @param pageIndex
-	 * @return pagedResults
+	 *            Page index, starts from 1.
+	 * @return pagedResults PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex) {
 		return criteria.list(pageIndex, Page.DEFAULT_ITEMS_PER_PAGE);
@@ -93,8 +112,10 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	 * Do page query.
 	 * 
 	 * @param pageIndex
+	 *            Page index, starts from 1.
 	 * @param itemsPerPage
-	 * @return pagedResults
+	 *            Page size.
+	 * @return pagedResults PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
 		return criteria.list(pageIndex, itemsPerPage);
@@ -102,6 +123,8 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 
 	/**
 	 * Get first row of the query, or null if no result found.
+	 * 
+	 * @return Object T or null.
 	 */
 	public T first() {
 		return criteria.first();
