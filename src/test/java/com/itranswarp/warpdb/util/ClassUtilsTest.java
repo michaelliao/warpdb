@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogConfigurationException;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.junit.Test;
 
 import com.itranswarp.warpdb.converter.EnumToStringConverter;
@@ -25,12 +25,13 @@ public class ClassUtilsTest {
 	@Test
 	public void testScanInJar() {
 		List<Class<?>> list = ClassUtils.scan("org.apache.commons", c -> {
-			return c.getName().startsWith("org.apache.commons.logging.Log");
+			return c.getName().startsWith("org.apache.commons.logging");
 		});
+		list.forEach(System.out::println);
 		assertTrue(list.size() >= 3);
 		assertTrue(list.contains(Log.class));
-		assertTrue(list.contains(LogConfigurationException.class));
 		assertTrue(list.contains(LogFactory.class));
+		assertTrue(list.contains(LogFactoryImpl.class));
 	}
 
 }

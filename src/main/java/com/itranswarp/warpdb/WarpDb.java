@@ -73,6 +73,7 @@ public class WarpDb {
 		Map<Class<?>, Mapper<?>> classMapping = new HashMap<>();
 		Map<String, Mapper<?>> tableMapping = new HashMap<>();
 		for (Class<?> clazz : classes) {
+			log.info("Found class: " + clazz.getName());
 			Mapper<?> mapper = new Mapper<>(clazz);
 			classMapping.put(clazz, mapper);
 			if (null != tableMapping.put(mapper.tableName.toLowerCase(), mapper)) {
