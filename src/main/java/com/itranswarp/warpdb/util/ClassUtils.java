@@ -1,6 +1,7 @@
 package com.itranswarp.warpdb.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,30 +48,36 @@ public final class ClassUtils {
 	 */
 	public static List<Class<?>> scan(String basePackage, Predicate<Class<?>> predicate) {
 		List<Class<?>> classes = new ArrayList<>(100);
-		try {
-			loadClasses(basePackage, classes, predicate);
-		} catch (RuntimeException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		loadClasses(basePackage, classes, predicate);
 		return classes;
 	}
 
-	static void loadClasses(String basePackage, List<Class<?>> classes, Predicate<Class<?>> predicate)
-			throws Exception {
+	static void loadClasses(String basePackage, List<Class<?>> classes, Predicate<Class<?>> predicate) {
 		ClassLoader cl = ClassUtils.class.getClassLoader();
-		Enumeration<URL> resources = cl.getResources(basePackage.replace('.', '/'));
+		Enumeration<URL> resources = null;
+		try {
+			resources = cl.getResources(basePackage.replace('.', '/'));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		while (resources.hasMoreElements()) {
 			String url = resources.nextElement().toString();
 			if (url.startsWith("file:")) {
 				File dir = new File(url.substring(5));
 				if (dir.isDirectory()) {
-					loadClassesInDir(dir, basePackage, classes, predicate);
+					try {
+						loadClassesInDir(dir, basePackage, classes, predicate);
+					} catch (Exception e) {
+						log.warn("error scan url: " + url, e);
+					}
 				}
 			} else if (url.startsWith("jar:file:")) {
 				String jar = url.substring(9, url.length() - basePackage.length() - 2);
-				loadClassesInJar(new File(jar), basePackage, classes, predicate);
+				try {
+					loadClassesInJar(new File(jar), basePackage, classes, predicate);
+				} catch (Exception e) {
+					log.warn("error scan url: " + url, e);
+				}
 			}
 		}
 	}
