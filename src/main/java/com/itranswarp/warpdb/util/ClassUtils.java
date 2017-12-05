@@ -12,10 +12,7 @@ import javax.persistence.Entity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
 import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 public final class ClassUtils {
 
