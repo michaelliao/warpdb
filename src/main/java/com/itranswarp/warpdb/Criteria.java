@@ -24,6 +24,7 @@ final class Criteria<T> {
 	List<String> where = null;
 	List<Object> whereParams = null;
 	List<String> orderBy = null;
+	boolean forUpdate = false;
 	int offset = 0;
 	int maxResults = 0;
 
@@ -51,6 +52,9 @@ final class Criteria<T> {
 		}
 		if (aggregate == null && offset >= 0 && maxResults > 0) {
 			sb.append(" LIMIT ?, ?");
+		}
+		if (aggregate == null && forUpdate) {
+			sb.append(" FOR UPDATE");
 		}
 		String s = sb.toString();
 		return s;

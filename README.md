@@ -28,7 +28,7 @@ Maven dependency:
 <dependency>
     <groupId>com.itranswarp</groupId>
     <artifactId>warpdb</artifactId>
-    <version>3.1</version>
+    <version>3.2</version>
 </dependency>
 ```
 
@@ -105,6 +105,14 @@ Get first result or null if not found:
 User user = warpdb.from(User.class)
         .where("name=?", "bob")
         .orderBy("updatedAt").desc()
+        .first();
+```
+
+Query for update:
+
+```
+User user = warpdb.selectForUpdate()
+        .where("id=?", 123)
         .first();
 ```
 

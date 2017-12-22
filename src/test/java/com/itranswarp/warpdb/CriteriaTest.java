@@ -43,6 +43,21 @@ public class CriteriaTest {
 	}
 
 	@Test
+	public void testSelectForUpdate() {
+		assertEquals("SELECT * FROM user FOR UPDATE", warpdb.selectForUpdate().from(User.class).sql());
+		assertEquals("SELECT * FROM user ORDER BY name FOR UPDATE",
+				warpdb.selectForUpdate().from(User.class).orderBy("name").sql());
+		assertEquals("SELECT email, name FROM user FOR UPDATE",
+				warpdb.selectForUpdate("email", "name").from(User.class).sql());
+		assertEquals("SELECT * FROM user LIMIT ?, ? FOR UPDATE",
+				warpdb.selectForUpdate().from(User.class).limit(100).sql());
+		assertEquals("SELECT * FROM user WHERE name = ? FOR UPDATE",
+				warpdb.selectForUpdate().from(User.class).where("name = ?", "Bob").sql());
+		assertEquals("SELECT * FROM user WHERE name = ? AND the_tag > ? FOR UPDATE",
+				warpdb.selectForUpdate().from(User.class).where("name = ?", "Bob").and("tag > ?", 10).sql());
+	}
+
+	@Test
 	public void testAggregate() {
 		assertEquals("SELECT COUNT(*) FROM user", warpdb.from(User.class).sql("COUNT(*)"));
 		assertEquals("SELECT COUNT(*) FROM user WHERE name > ?",

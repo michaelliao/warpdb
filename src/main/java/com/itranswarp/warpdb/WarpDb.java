@@ -165,6 +165,13 @@ public class WarpDb {
 		return new Select(new Criteria(this), selectFields);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Select selectForUpdate(String... selectFields) {
+		Criteria c = new Criteria(this);
+		c.forUpdate = true;
+		return new Select(c, selectFields);
+	}
+
 	public <T> From<T> from(Class<T> entityClass) {
 		Mapper<T> mapper = getMapper(entityClass);
 		return new From<>(new Criteria<>(this), mapper);
