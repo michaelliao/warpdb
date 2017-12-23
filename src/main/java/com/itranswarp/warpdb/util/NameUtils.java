@@ -3,7 +3,7 @@ package com.itranswarp.warpdb.util;
 public class NameUtils {
 
 	/**
-	 * to camel case name. e.g. "HelloWorld" -> "helloWorld.
+	 * to camel case name. e.g. "HelloWorld" to "helloWorld.
 	 * 
 	 * @param name
 	 *            Name starts with upper case.
@@ -14,7 +14,7 @@ public class NameUtils {
 	}
 
 	/**
-	 * To underscore name. e.g. "HelloWorld" -> "hello_world".
+	 * To underscore name. e.g. "HelloWorld" to "hello_world".
 	 * 
 	 * @param name
 	 *            Name without underscore.

@@ -146,6 +146,14 @@ public class WarpDb {
 		return t;
 	}
 
+	/**
+	 * Remove beans by id.
+	 * 
+	 * @param <T>
+	 *            Generic type.
+	 * @param beans
+	 *            The entities.
+	 */
 	public <T> void remove(@SuppressWarnings("unchecked") T... beans) {
 		try {
 			for (Object bean : beans) {
@@ -180,6 +188,8 @@ public class WarpDb {
 	/**
 	 * Update entities' updatable properties by id.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param beans
 	 *            Entity objects.
 	 */
@@ -207,6 +217,8 @@ public class WarpDb {
 	/**
 	 * Update entity's specified properties.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param bean
 	 *            Entity object.
 	 * @param properties
@@ -247,6 +259,8 @@ public class WarpDb {
 	/**
 	 * Persist entity objects.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param beans
 	 *            Entity objects.
 	 */
@@ -303,6 +317,8 @@ public class WarpDb {
 	/**
 	 * Execute query.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param sql
 	 *            The select SQL.
 	 * @param args
@@ -326,6 +342,8 @@ public class WarpDb {
 	/**
 	 * Get list of entity.
 	 * 
+	 * @param <T>
+	 *            Generic type.
 	 * @param clazz
 	 *            Entity class.
 	 * @param sql
@@ -372,6 +390,17 @@ public class WarpDb {
 		return OptionalInt.of(number.intValue());
 	}
 
+	/**
+	 * Get unique object.
+	 * 
+	 * @param <T>
+	 *            Generic type.
+	 * @param sql
+	 *            The SQL.
+	 * @param args
+	 *            The arguments.
+	 * @return Object.
+	 */
 	public <T> T unique(String sql, Object... args) {
 		if (sql.toLowerCase().indexOf(" limit ") == (-1)) {
 			sql = sql + " limit 2";
