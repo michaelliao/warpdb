@@ -429,6 +429,21 @@ public class WarpDb {
 		return list.get(0);
 	}
 
+	/**
+	 * Get table name by entity class.
+	 * 
+	 * @param clazz
+	 *            Entity class.
+	 * @return Table name.
+	 */
+	public String getTable(Class<?> clazz) {
+		Mapper<?> mapper = (Mapper<?>) this.classMapping.get(clazz);
+		if (mapper == null) {
+			throw new RuntimeException("Target class is not a registered entity: " + clazz.getName());
+		}
+		return mapper.tableName;
+	}
+
 	// get mapper by class:
 	@SuppressWarnings("unchecked")
 	<T> Mapper<T> getMapper(Class<T> clazz) {
