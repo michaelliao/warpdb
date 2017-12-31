@@ -4,7 +4,7 @@
 
 	<groupId>com.itranswarp</groupId>
 	<artifactId>warpdb</artifactId>
-	<version>3.3</version>
+	<version>3.4</version>
 	<packaging>jar</packaging>
 
 	<name>warpdb</name>
@@ -49,7 +49,7 @@
 		<hsqldb.version>2.3.3</hsqldb.version>
 		<javax.annotation.version>1.2</javax.annotation.version>
 		<junit.version>4.12</junit.version>
-		<spring.version>4.3.7.RELEASE</spring.version>
+		<spring.version>4.3.13.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
@@ -60,13 +60,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
+			<artifactId>spring-context</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
-			<version>0.9.11</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.javax.persistence</groupId>

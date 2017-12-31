@@ -4,19 +4,14 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 public final class ClassUtils {
-
-	static final Log log = LogFactory.getLog(ClassUtils.class);
 
 	/**
 	 * Scan @Entity classes in base packages.
@@ -26,30 +21,20 @@ public final class ClassUtils {
 	 * @return List of entity class.
 	 */
 	public static List<Class<?>> scanEntities(String... basePackages) {
+		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+		provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
 		List<Class<?>> classes = new ArrayList<>();
 		for (String basePackage : basePackages) {
-			classes.addAll(ClassUtils.scan(basePackage, c -> {
-				return c.isAnnotationPresent(Entity.class);
-			}));
+			Set<BeanDefinition> beans = provider.findCandidateComponents(basePackage);
+			for (BeanDefinition bean : beans) {
+				try {
+					classes.add(Class.forName(bean.getBeanClassName()));
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		return classes;
-	}
-
-	/**
-	 * Scan classes that match the predicate.
-	 * 
-	 * @param basePackage
-	 *            Base package name.
-	 * @param predicate
-	 *            Filter condition.
-	 * @return List of classes.
-	 */
-	public static List<Class<?>> scan(String basePackage, Predicate<Class<?>> predicate) {
-		log.info("Scan " + basePackage + "...");
-		Reflections ref = new Reflections(basePackage, new SubTypesScanner(false));
-		Set<Class<?>> set = ref.getSubTypesOf(Object.class);
-		return set.stream().filter((c) -> c.getPackage().getName().startsWith(basePackage)).filter(predicate)
-				.collect(Collectors.toList());
 	}
 
 	public static List<Type> getGenericInterfacesIncludeHierarchy(Class<?> clazz) {
