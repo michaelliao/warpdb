@@ -38,15 +38,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import com.itranswarp.warpdb.util.ClassUtils;
 
 /**
- * A lightweight Spring-JdbcTemplate wrapper using DSL-style operation like:
- * 
- * <code>
- *     List<User> users = db.from(User.class)
- *                          .where("id &lg; ?", 100)
- *                          .orderBy("name").desc()
- *                          .limit(20)
- *                          .list();
- * </code>
+ * A lightweight Spring-JdbcTemplate wrapper using DSL-style operation.
  * 
  * @author liaoxuefeng
  */
