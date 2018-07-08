@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -149,10 +150,42 @@ final class Mapper<T> {
 		this.postRemove = findListener(methods, PostRemove.class);
 	}
 
+	static List<String> columnDefinitionSortBy = Arrays.asList("BIT", "BOOL", "TINYINT", "SMALLINT", "MEDIUMINT", "INT",
+			"BIGINT", "FLOAT", "REAL", "DOUBLE", "DECIMAL", "YEAR", "DATE", "TIME", "DATETIME", "TIMESTAMP", "VARCHAR",
+			"CHAR", "BLOB", "TEXT", "MEDIUMTEXT");
+
+	static int columnDefinitionSortIndex(String definition) {
+		int pos = definition.indexOf('(');
+		if (pos > 0) {
+			definition = definition.substring(0, pos);
+		}
+		int index = columnDefinitionSortBy.indexOf(definition.toUpperCase());
+		return index == (-1) ? Integer.MAX_VALUE : index;
+	}
+
 	public String ddl() {
 		StringBuilder sb = new StringBuilder(256);
 		sb.append("CREATE TABLE ").append(this.tableName).append(" (\n");
-		sb.append(String.join(",\n", this.allProperties.stream().map((p) -> {
+		sb.append(String.join(",\n", this.allProperties.stream().sorted(new Comparator<AccessibleProperty>() {
+			@Override
+			public int compare(AccessibleProperty o1, AccessibleProperty o2) {
+				// sort by ID first:
+				if (o1.isId()) {
+					return -1;
+				}
+				if (o2.isId()) {
+					return 1;
+				}
+				// sort by columnDefinition:
+				int index1 = columnDefinitionSortIndex(o1.columnDefinition);
+				int index2 = columnDefinitionSortIndex(o2.columnDefinition);
+				if (index1 != index2) {
+					return Integer.compare(index1, index2);
+				}
+				// sort by columnName:
+				return o1.columnName.compareTo(o2.columnName);
+			}
+		}).map((p) -> {
 			return "  " + p.columnName + " " + p.columnDefinition // definition
 					+ (p.isIdentityId() ? " AUTO_INCREMENT" : "") // identity
 					+ (p.nullable ? " NULL" : " NOT NULL") // nullable?
