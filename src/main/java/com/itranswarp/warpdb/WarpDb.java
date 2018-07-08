@@ -42,7 +42,7 @@ import com.itranswarp.warpdb.util.ClassUtils;
  * 
  * <code>
  *     List<User> users = db.from(User.class)
- *                          .where("id > ?", 100)
+ *                          .where("id &lg; ?", 100)
  *                          .orderBy("name").desc()
  *                          .limit(20)
  *                          .list();
