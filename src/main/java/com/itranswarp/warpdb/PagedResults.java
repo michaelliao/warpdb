@@ -4,6 +4,13 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Represent a paged result list.
+ * 
+ * @author liaoxuefeng
+ *
+ * @param <T> Generic type.
+ */
 public class PagedResults<T> {
 
 	public final Page page;

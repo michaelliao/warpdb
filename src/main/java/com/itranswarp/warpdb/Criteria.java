@@ -7,10 +7,9 @@ import java.util.List;
 /**
  * Hold criteria query information.
  * 
- * @author Michael Liao
+ * @author liaoxuefeng
  * 
- * @param <T>
- *            Entity type.
+ * @param <T> Entity type.
  */
 final class Criteria<T> {
 

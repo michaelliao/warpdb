@@ -5,6 +5,8 @@ import java.util.Arrays;
 /**
  * SELECT ... from ...
  * 
+ * Default to "*".
+ * 
  * @author liaoxuefeng
  */
 @SuppressWarnings("rawtypes")
@@ -30,8 +32,7 @@ public final class Select extends CriteriaQuery {
 	/**
 	 * Add from clause.
 	 * 
-	 * @param entityClass
-	 *            The entity class.
+	 * @param entityClass The entity class.
 	 * @return The criteria object.
 	 */
 	@SuppressWarnings("unchecked")

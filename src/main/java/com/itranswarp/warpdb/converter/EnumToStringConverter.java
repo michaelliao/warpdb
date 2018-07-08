@@ -2,6 +2,13 @@ package com.itranswarp.warpdb.converter;
 
 import javax.persistence.AttributeConverter;
 
+/**
+ * Built-in converter to store Java enum type as VARCHAR in database.
+ * 
+ * @author liaoxuefeng
+ *
+ * @param <T> Generic type.
+ */
 public class EnumToStringConverter<T extends Enum<T>> implements AttributeConverter<Enum<T>, String> {
 
 	final Class<T> enumType;

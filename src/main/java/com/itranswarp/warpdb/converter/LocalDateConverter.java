@@ -6,6 +6,11 @@ import java.time.ZoneId;
 
 import javax.persistence.AttributeConverter;
 
+/**
+ * Built-in converter to store Java LocalDate type to database DATE type.
+ * 
+ * @author liaoxuefeng
+ */
 public class LocalDateConverter implements AttributeConverter<LocalDate, java.sql.Date> {
 
 	static final ZoneId SYSTEM_ZONE_ID = ZoneId.systemDefault();

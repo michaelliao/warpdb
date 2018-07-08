@@ -72,8 +72,7 @@ class AccessibleProperty {
 		return this.accessible.isAnnotationPresent(Id.class);
 	}
 
-	// is id && is id marked as
-	// @GeneratedValue(strategy=GenerationType.IDENTITY)
+	// is id && is id marked as @GeneratedValue(strategy=GenerationType.IDENTITY)
 	boolean isIdentityId() {
 		if (!isId()) {
 			return false;

@@ -7,8 +7,7 @@ import java.util.List;
  * 
  * @author liaoxuefeng
  *
- * @param <T>
- *            Generic type.
+ * @param <T> Generic type.
  */
 public final class Limit<T> extends CriteriaQuery<T> {
 

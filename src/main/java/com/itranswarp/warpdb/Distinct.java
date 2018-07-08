@@ -14,6 +14,12 @@ public final class Distinct extends CriteriaQuery {
 		criteria.distinct = true;
 	}
 
+	/**
+	 * Continue with FROM clause.
+	 * 
+	 * @param entityClass The entity class.
+	 * @return Criteria query object.
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> From<T> from(Class<T> entityClass) {
 		return new From<T>(this.criteria, this.criteria.warpdb.getMapper(entityClass));

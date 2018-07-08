@@ -8,7 +8,7 @@ import java.util.List;
  * 
  * @author liaoxuefeng
  * 
- * @param <T>
+ * @param <T> Generic type.
  */
 public final class OrderBy<T> extends CriteriaQuery<T> {
 
@@ -17,6 +17,12 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 		orderBy(orderBy);
 	}
 
+	/**
+	 * Order by field name.
+	 * 
+	 * @param orderBy The field name.
+	 * @return Criteria query object.
+	 */
 	public OrderBy<T> orderBy(String orderBy) {
 		if (criteria.orderBy == null) {
 			criteria.orderBy = new ArrayList<>();
@@ -67,8 +73,7 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	/**
 	 * Add limit clause.
 	 * 
-	 * @param maxResults
-	 *            The max results.
+	 * @param maxResults The max results.
 	 * @return Criteria query object.
 	 */
 	public Limit<T> limit(int maxResults) {
@@ -78,10 +83,8 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	/**
 	 * Add limit clause.
 	 * 
-	 * @param offset
-	 *            Offset.
-	 * @param maxResults
-	 *            The max results.
+	 * @param offset     Offset.
+	 * @param maxResults The max results.
 	 * @return Criteria query object.
 	 */
 	public Limit<T> limit(int offset, int maxResults) {
@@ -100,8 +103,7 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	/**
 	 * Do page query using default items per page.
 	 * 
-	 * @param pageIndex
-	 *            Page index, starts from 1.
+	 * @param pageIndex Page index, starts from 1.
 	 * @return pagedResults PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex) {
@@ -111,10 +113,8 @@ public final class OrderBy<T> extends CriteriaQuery<T> {
 	/**
 	 * Do page query.
 	 * 
-	 * @param pageIndex
-	 *            Page index, starts from 1.
-	 * @param itemsPerPage
-	 *            Page size.
+	 * @param pageIndex    Page index, starts from 1.
+	 * @param itemsPerPage Page size.
 	 * @return pagedResults PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {

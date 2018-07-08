@@ -3,6 +3,11 @@ package com.itranswarp.warpdb;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represent a Page object using by limit(offset, maxResults).
+ * 
+ * @author liaoxuefeng
+ */
 public class Page {
 
 	public static final int DEFAULT_ITEMS_PER_PAGE = 20;

@@ -17,7 +17,7 @@ import javax.persistence.AttributeConverter;
  * 
  * @author liaoxuefeng
  * 
- * @param <T>
+ * @param <T> Generic type.
  */
 public final class Where<T> extends CriteriaQuery<T> {
 
@@ -95,8 +95,7 @@ public final class Where<T> extends CriteriaQuery<T> {
 	/**
 	 * Do page query using default items per page.
 	 * 
-	 * @param pageIndex
-	 *            The page index, starts from 1.
+	 * @param pageIndex The page index, starts from 1.
 	 * @return The PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex) {
@@ -106,10 +105,8 @@ public final class Where<T> extends CriteriaQuery<T> {
 	/**
 	 * Do page query.
 	 * 
-	 * @param pageIndex
-	 *            The page index, starts from 1.
-	 * @param itemsPerPage
-	 *            Page size.
+	 * @param pageIndex    The page index, starts from 1.
+	 * @param itemsPerPage Page size.
 	 * @return The PagedResults object.
 	 */
 	public PagedResults<T> list(int pageIndex, int itemsPerPage) {
@@ -135,14 +132,13 @@ public final class Where<T> extends CriteriaQuery<T> {
 	}
 
 	/**
-	 * Get unique result of the query. Exception will throw if no result found
-	 * or more than 1 results found.
+	 * Get unique result of the query. Exception will throw if no result found or
+	 * more than 1 results found.
 	 * 
 	 * @return T modelInstance
-	 * @throws javax.persistence.NoResultException
-	 *             If result set is empty.
-	 * @throws javax.persistence.NonUniqueResultException
-	 *             If more than 1 results found.
+	 * @throws javax.persistence.NoResultException If result set is empty.
+	 * @throws javax.persistence.NonUniqueResultException If more than 1 results
+	 *         found.
 	 */
 	public T unique() {
 		return this.criteria.unique();

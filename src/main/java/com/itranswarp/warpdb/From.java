@@ -9,8 +9,7 @@ import java.util.stream.Collectors;
  * 
  * @author liaoxuefeng
  *
- * @param <T>
- *            Generic type.
+ * @param <T> Generic type.
  */
 public final class From<T> extends CriteriaQuery<T> {
 
@@ -42,10 +41,8 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Add where clause.
 	 * 
-	 * @param clause
-	 *            Clause like "name = ?".
-	 * @param args
-	 *            Arguments to match clause.
+	 * @param clause Clause like "name = ?".
+	 * @param args   Arguments to match clause.
 	 * @return CriteriaQuery object.
 	 */
 	public Where<T> where(String clause, Object... args) {
@@ -55,8 +52,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Add order by clause.
 	 * 
-	 * @param orderBy
-	 *            Field of order by.
+	 * @param orderBy Field of order by.
 	 * @return CriteriaQuery object.
 	 */
 	public OrderBy<T> orderBy(String orderBy) {
@@ -66,8 +62,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Add limit clause.
 	 * 
-	 * @param maxResults
-	 *            The max results.
+	 * @param maxResults The max results.
 	 * @return CriteriaQuery object.
 	 */
 	public Limit<T> limit(int maxResults) {
@@ -77,10 +72,8 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Add limit clause.
 	 * 
-	 * @param offset
-	 *            The offset.
-	 * @param maxResults
-	 *            The max results.
+	 * @param offset     The offset.
+	 * @param maxResults The max results.
 	 * @return CriteriaQuery object.
 	 */
 	public Limit<T> limit(int offset, int maxResults) {
@@ -99,8 +92,7 @@ public final class From<T> extends CriteriaQuery<T> {
 	/**
 	 * Do page query using default items per page.
 	 * 
-	 * @param pageIndex
-	 *            Page index, starts from 1.
+	 * @param pageIndex Page index, starts from 1.
 	 * @return pageResult PageResults object.
 	 */
 	public PagedResults<T> list(int pageIndex) {
@@ -137,14 +129,13 @@ public final class From<T> extends CriteriaQuery<T> {
 	}
 
 	/**
-	 * Get unique result of the query. Exception will throw if no result found
-	 * or more than 1 results found.
+	 * Get unique result of the query. Exception will throw if no result found or
+	 * more than 1 results found.
 	 * 
 	 * @return T modelInstance
-	 * @throws javax.persistence.NoResultException
-	 *             If result set is empty.
-	 * @throws javax.persistence.NonUniqueResultException
-	 *             If more than 1 results found.
+	 * @throws javax.persistence.NoResultException If result set is empty.
+	 * @throws javax.persistence.NonUniqueResultException If more than 1 results
+	 *         found.
 	 */
 	public T unique() {
 		return this.criteria.unique();
