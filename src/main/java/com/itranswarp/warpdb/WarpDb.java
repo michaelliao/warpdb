@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -51,6 +52,7 @@ public class WarpDb {
 
 	// class -> Mapper:
 	Map<Class<?>, Mapper<?>> classMapping;
+
 	// tableName -> Mapper:
 	Map<String, Mapper<?>> tableMapping;
 
@@ -93,6 +95,11 @@ public class WarpDb {
 		return mapper.ddl();
 	}
 
+	/**
+	 * Export schema as DDL.
+	 * 
+	 * @return DDL as SQL string.
+	 */
 	public String exportSchema() {
 		return String.join("\n\n", this.tableMapping.values().stream().map((mapper) -> {
 			return mapper.ddl();
@@ -100,15 +107,12 @@ public class WarpDb {
 	}
 
 	/**
-	 * Get a model instance by class type and id. EntityNotFoundException is
-	 * thrown if not found.
+	 * Get a model instance by class type and id. EntityNotFoundException is thrown
+	 * if not found.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param clazz
-	 *            Entity class.
-	 * @param id
-	 *            Id value.
+	 * @param       <T> Generic type.
+	 * @param clazz Entity class.
+	 * @param id    Id value.
 	 * @return Entity bean found by id.
 	 */
 	public <T> T get(Class<T> clazz, Serializable id) {
@@ -122,12 +126,9 @@ public class WarpDb {
 	/**
 	 * Get a model instance by class type and id. Return null if not found.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param clazz
-	 *            Entity class.
-	 * @param id
-	 *            Id value.
+	 * @param       <T> Generic type.
+	 * @param clazz Entity class.
+	 * @param id    Id value.
 	 * @return Entity bean found by id.
 	 */
 	public <T> T fetch(Class<T> clazz, Serializable id) {
@@ -149,10 +150,8 @@ public class WarpDb {
 	/**
 	 * Remove beans by id.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param beans
-	 *            The entities.
+	 * @param       <T> Generic type.
+	 * @param beans The entities.
 	 */
 	public <T> void remove(@SuppressWarnings("unchecked") T... beans) {
 		try {
@@ -188,10 +187,8 @@ public class WarpDb {
 	/**
 	 * Update entities' updatable properties by id.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param beans
-	 *            Entity objects.
+	 * @param       <T> Generic type.
+	 * @param beans Entity objects.
 	 */
 	public <T> void update(@SuppressWarnings("unchecked") T... beans) {
 		try {
@@ -217,12 +214,9 @@ public class WarpDb {
 	/**
 	 * Update entity's specified properties.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param bean
-	 *            Entity object.
-	 * @param properties
-	 *            Properties' names.
+	 * @param            <T> Generic type.
+	 * @param bean       Entity object.
+	 * @param properties Properties' names.
 	 */
 	public <T> void updateProperties(T bean, String... properties) {
 		if (properties.length == 0) {
@@ -259,43 +253,96 @@ public class WarpDb {
 	/**
 	 * Persist entity objects.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param beans
-	 *            Entity objects.
+	 * @param       <T> Generic type.
+	 * @param beans Entity objects.
 	 */
 	public <T> void save(@SuppressWarnings("unchecked") T... beans) {
+		if (beans.length == 0) {
+			return;
+		}
+		if (beans.length == 1) {
+			saveOne(beans[0]);
+		} else {
+			saveBatch(beans);
+		}
+	}
+
+	<T> void saveBatch(@SuppressWarnings("unchecked") T... beans) {
 		try {
-			for (T bean : beans) {
-				Mapper<?> mapper = getMapper(bean.getClass());
-				mapper.prePersist.invoke(bean);
-				Object[] args = new Object[mapper.insertableProperties.size()];
-				int n = 0;
-				for (AccessibleProperty prop : mapper.insertableProperties) {
-					args[n] = prop.convertGetter.get(bean);
-					n++;
-				}
-				log.debug("SQL: " + mapper.insertSQL);
-				if (mapper.id.isIdentityId()) {
-					// using identityId:
-					KeyHolder keyHolder = new GeneratedKeyHolder();
-					jdbcTemplate.update(new PreparedStatementCreator() {
-						public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-							PreparedStatement ps = connection.prepareStatement(mapper.insertSQL,
-									Statement.RETURN_GENERATED_KEYS);
-							for (int i = 0; i < args.length; i++) {
-								ps.setObject(i + 1, args[i]);
+			Mapper<?> mapper = getMapper(beans[0].getClass());
+			jdbcTemplate.execute(new ConnectionCallback<Object>() {
+				@Override
+				public Object doInConnection(Connection con) throws SQLException, DataAccessException {
+					try (PreparedStatement ps = mapper.id.isIdentityId()
+							? con.prepareStatement(mapper.insertSQL, Statement.RETURN_GENERATED_KEYS)
+							: con.prepareStatement(mapper.insertSQL)) {
+						for (T bean : beans) {
+							mapper.prePersist.invoke(bean);
+							int n = 0;
+							for (AccessibleProperty prop : mapper.insertableProperties) {
+								Object arg = prop.convertGetter.get(bean);
+								n++;
+								ps.setObject(n, arg);
 							}
-							return ps;
+							ps.addBatch();
 						}
-					}, keyHolder);
-					mapper.id.convertSetter.set(bean, keyHolder.getKey());
-				} else {
-					// id is specified:
-					jdbcTemplate.update(mapper.insertSQL, args);
+						ps.executeBatch();
+						if (mapper.id.isIdentityId()) {
+							// using identityId:
+							try (ResultSet rs = ps.getGeneratedKeys()) {
+								for (T bean : beans) {
+									if (rs.next()) {
+										mapper.id.convertSetter.set(bean, rs.getObject(1));
+									} else {
+										throw new RuntimeException("Not enough id returned.");
+									}
+								}
+							}
+						}
+						return null;
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						throw new RuntimeException(e);
+					}
 				}
+			});
+			for (T bean : beans) {
 				mapper.postPersist.invoke(bean);
 			}
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	<T> void saveOne(T bean) {
+		try {
+			Mapper<?> mapper = getMapper(bean.getClass());
+			mapper.prePersist.invoke(bean);
+			Object[] args = new Object[mapper.insertableProperties.size()];
+			int n = 0;
+			for (AccessibleProperty prop : mapper.insertableProperties) {
+				args[n] = prop.convertGetter.get(bean);
+				n++;
+			}
+			log.debug("SQL: " + mapper.insertSQL);
+			if (mapper.id.isIdentityId()) {
+				// using identityId:
+				KeyHolder keyHolder = new GeneratedKeyHolder();
+				jdbcTemplate.update(new PreparedStatementCreator() {
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+						PreparedStatement ps = connection.prepareStatement(mapper.insertSQL,
+								Statement.RETURN_GENERATED_KEYS);
+						for (int i = 0; i < args.length; i++) {
+							ps.setObject(i + 1, args[i]);
+						}
+						return ps;
+					}
+				}, keyHolder);
+				mapper.id.convertSetter.set(bean, keyHolder.getKey());
+			} else {
+				// id is specified:
+				jdbcTemplate.update(mapper.insertSQL, args);
+			}
+			mapper.postPersist.invoke(bean);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new PersistenceException(e);
 		}
@@ -304,10 +351,8 @@ public class WarpDb {
 	/**
 	 * Execute update SQL.
 	 * 
-	 * @param sql
-	 *            The update SQL.
-	 * @param args
-	 *            The arguments that match the SQL.
+	 * @param sql  The update SQL.
+	 * @param args The arguments that match the SQL.
 	 * @return int result of update.
 	 */
 	public int update(String sql, Object... args) {
@@ -317,12 +362,9 @@ public class WarpDb {
 	/**
 	 * Execute query.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param sql
-	 *            The select SQL.
-	 * @param args
-	 *            The arguments that match the SQL.
+	 * @param      <T> Generic type.
+	 * @param sql  The select SQL.
+	 * @param args The arguments that match the SQL.
 	 * @return List of object T.
 	 */
 	public <T> List<T> list(String sql, Object... args) {
@@ -342,14 +384,10 @@ public class WarpDb {
 	/**
 	 * Get list of entity.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param clazz
-	 *            Entity class.
-	 * @param sql
-	 *            Raw SQL.
-	 * @param args
-	 *            Arguments.
+	 * @param       <T> Generic type.
+	 * @param clazz Entity class.
+	 * @param sql   Raw SQL.
+	 * @param args  Arguments.
 	 * @return List of entities.
 	 */
 	public <T> List<T> list(Class<T> clazz, String sql, Object... args) {
@@ -393,12 +431,9 @@ public class WarpDb {
 	/**
 	 * Get unique object.
 	 * 
-	 * @param <T>
-	 *            Generic type.
-	 * @param sql
-	 *            The SQL.
-	 * @param args
-	 *            The arguments.
+	 * @param      <T> Generic type.
+	 * @param sql  The SQL.
+	 * @param args The arguments.
 	 * @return Object.
 	 */
 	public <T> T unique(String sql, Object... args) {
@@ -432,8 +467,7 @@ public class WarpDb {
 	/**
 	 * Get table name by entity class.
 	 * 
-	 * @param clazz
-	 *            Entity class.
+	 * @param clazz Entity class.
 	 * @return Table name.
 	 */
 	public String getTable(Class<?> clazz) {
