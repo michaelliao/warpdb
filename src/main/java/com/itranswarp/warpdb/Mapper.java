@@ -151,8 +151,8 @@ final class Mapper<T> {
 	}
 
 	static List<String> columnDefinitionSortBy = Arrays.asList("BIT", "BOOL", "TINYINT", "SMALLINT", "MEDIUMINT", "INT",
-			"BIGINT", "FLOAT", "REAL", "DOUBLE", "DECIMAL", "YEAR", "DATE", "TIME", "DATETIME", "TIMESTAMP", "VARCHAR",
-			"CHAR", "BLOB", "TEXT", "MEDIUMTEXT");
+			"INTEGER", "BIGINT", "FLOAT", "REAL", "DOUBLE", "DECIMAL", "YEAR", "DATE", "TIME", "DATETIME", "TIMESTAMP",
+			"VARCHAR", "CHAR", "BLOB", "TEXT", "MEDIUMTEXT");
 
 	static int columnDefinitionSortIndex(String definition) {
 		int pos = definition.indexOf('(');
@@ -181,6 +181,12 @@ final class Mapper<T> {
 				int index2 = columnDefinitionSortIndex(o2.columnDefinition);
 				if (index1 != index2) {
 					return Integer.compare(index1, index2);
+				}
+				if (o1.columnDefinition.startsWith("VARCHAR") || o1.columnDefinition.startsWith("CHAR")) {
+					// sort by length:
+					if (o1.columnDefinition.length() != o2.columnDefinition.length()) {
+						return Integer.compare(o1.columnDefinition.length(), o2.columnDefinition.length());
+					}
 				}
 				// sort by columnName:
 				return o1.columnName.compareTo(o2.columnName);
