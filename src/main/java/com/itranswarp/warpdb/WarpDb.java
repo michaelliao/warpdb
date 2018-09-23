@@ -56,14 +56,29 @@ public class WarpDb {
 	// tableName -> Mapper:
 	Map<String, Mapper<?>> tableMapping;
 
+	/**
+	 * Set DataSource instance.
+	 * 
+	 * @param dataSource DataSource instance.
+	 */
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource, false);
 	}
 
+	/**
+	 * Set JdbcTemplate instance.
+	 * 
+	 * @param jdbcTemplate JdbcTemplate instance
+	 */
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
+	/**
+	 * Get JdbcTemplate instance.
+	 * 
+	 * @return JdbcTemplate instance
+	 */
 	public JdbcTemplate getJdbcTemplate() {
 		return this.jdbcTemplate;
 	}
@@ -406,6 +421,19 @@ public class WarpDb {
 			throw new PersistenceException(e);
 		}
 		return list;
+	}
+
+	/**
+	 * Query for list by JdbcTemplate's RowMapper.
+	 * 
+	 * @param rowMapper Spring JdbcTemplate's RowMapper.
+	 * @param sql       Raw SQL.
+	 * @param args      Arguments.
+	 * @return List of entities.
+	 */
+	public <T> List<T> queryForList(RowMapper<T> rowMapper, String sql, Object... args) {
+		log.debug("SQL: " + sql);
+		return jdbcTemplate.query(sql, args, rowMapper);
 	}
 
 	public Optional<Number> queryForNumber(String sql, Object... args) {
