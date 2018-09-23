@@ -64,6 +64,10 @@ public class WarpDb {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
+	public JdbcTemplate getJdbcTemplate() {
+		return this.jdbcTemplate;
+	}
+
 	public void setBasePackages(List<String> basePackages) {
 		this.basePackages = basePackages;
 	}
