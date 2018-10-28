@@ -34,4 +34,17 @@ public class WarpDbEnumTest extends WarpDbTestBase {
 		assertNotNull(bak);
 		assertNull(bak.roleName);
 	}
+
+	@Test
+	public void testConvertWhere() throws Exception {
+		EnumEntity ee = new EnumEntity();
+		ee.id = EnumEntity.nextId();
+		ee.name = "Bob";
+		ee.roleName = Role.ADMIN;
+		warpdb.save(ee);
+		// query:
+		EnumEntity bak = warpdb.from(EnumEntity.class).where("roleName = ?", Role.ADMIN).first();
+		assertNotNull(bak);
+		assertEquals(Role.ADMIN, bak.roleName);
+	}
 }
