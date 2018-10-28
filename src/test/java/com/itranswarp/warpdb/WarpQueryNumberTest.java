@@ -58,28 +58,28 @@ public class WarpQueryNumberTest extends WarpDbTestBase {
 
 	@Test
 	public void testQueryForIntNotPresent() throws Exception {
-		warpdb.update("delete from User");
+		warpdb.updateSql("delete from User");
 		OptionalInt n = warpdb.queryForInt("select min(age) from User");
 		assertFalse(n.isPresent());
 	}
 
 	@Test
 	public void testQueryForLongNotPresent() throws Exception {
-		warpdb.update("delete from User");
+		warpdb.updateSql("delete from User");
 		OptionalLong n = warpdb.queryForLong("select max(age) from User");
 		assertFalse(n.isPresent());
 	}
 
 	@Test
 	public void testQueryForNumberNotPresent() throws Exception {
-		warpdb.update("delete from User");
+		warpdb.updateSql("delete from User");
 		Optional<Number> n = warpdb.queryForNumber("select max(age) from User");
 		assertFalse(n.isPresent());
 	}
 
 	@Test
 	public void testQueryForNumberPresent() throws Exception {
-		warpdb.update("delete from User");
+		warpdb.updateSql("delete from User");
 		Optional<Number> n = warpdb.queryForNumber("select count(id) from User");
 		assertTrue(n.isPresent());
 		assertEquals(0, n.get().intValue());

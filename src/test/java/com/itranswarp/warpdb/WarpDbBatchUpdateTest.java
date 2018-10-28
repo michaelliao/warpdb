@@ -2,6 +2,7 @@ package com.itranswarp.warpdb;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -18,25 +19,25 @@ public class WarpDbBatchUpdateTest extends WarpDbTestBase {
 			User user = new User();
 			user.name = "Name-" + i;
 			user.email = "name" + i + "@somewhere.org";
-			user.createdAt = user.updatedAt = 1234000 + i;
 			users[i] = user;
 		}
-		warpdb.save(users);
+		warpdb.save(Arrays.asList(users));
+		long ts = System.currentTimeMillis();
 		for (int i = 0; i < users.length; i++) {
 			User user = users[i];
 			assertEquals(String.format("%04d", i + 1), user.id);
 			assertEquals(user.createdAt, user.updatedAt);
-			assertEquals(1234000 + i, user.createdAt);
+			assertEquals(ts, user.createdAt, 500.0);
 		}
+		Thread.sleep(600);
 		// update:
 		for (int i = 0; i < users.length; i++) {
 			User user = users[i];
 			user.name = "Updated-" + i;
 			user.email = "updated" + i + "@new.org";
-			user.createdAt = 1000000 + i;
-			user.updatedAt = 1000000 + i;
 		}
-		warpdb.update(users);
+		warpdb.update(Arrays.asList(users));
+		ts = System.currentTimeMillis();
 		// check:
 		List<User> us = warpdb.from(User.class).orderBy("id").list();
 		for (int i = 0; i < us.size(); i++) {
@@ -45,8 +46,8 @@ public class WarpDbBatchUpdateTest extends WarpDbTestBase {
 			assertEquals("Updated-" + i, user.name);
 			assertEquals("name" + i + "@somewhere.org", user.email); // not updated
 			assertNotEquals(user.createdAt, user.updatedAt);
-			assertEquals(1234000 + i, user.createdAt); // not updated
-			assertEquals(1000000 + i, user.updatedAt);
+			assertEquals(ts, user.updatedAt, 500.0);
+			assertNotEquals(ts, user.createdAt, 500.0);
 		}
 	}
 

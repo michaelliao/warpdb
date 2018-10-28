@@ -28,7 +28,7 @@ Maven dependency:
 <dependency>
     <groupId>com.itranswarp</groupId>
     <artifactId>warpdb</artifactId>
-    <version>3.7</version>
+    <version>4.0</version>
 </dependency>
 ```
 
@@ -159,6 +159,10 @@ product.setName(...);
 warpdb.save(user, product);
 ```
 
+### Batch save
+
+Using `save(List<T>)` to do batch save entities.
+
 ### Update
 
 Using `update()` to update one or more entities:
@@ -171,6 +175,10 @@ product.setName(...);
 warpdb.update(user, product);
 ```
 
+### Batch update
+
+Using `update(List<T>)` to do batch update entities.
+
 ### Remove
 
 Using `remove()` to remove one or more entities:
@@ -180,6 +188,10 @@ User user = ...
 Product product = ...
 warpdb.remove(user, product);
 ```
+
+### Batch remove
+
+Using `remove(List<T>)` to do batch remove entities.
 
 # Misc
 

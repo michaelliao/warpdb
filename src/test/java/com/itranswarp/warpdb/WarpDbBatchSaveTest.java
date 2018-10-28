@@ -2,6 +2,8 @@ package com.itranswarp.warpdb;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import javax.persistence.PostPersist;
 import javax.persistence.PrePersist;
 
@@ -21,14 +23,14 @@ public class WarpDbBatchSaveTest extends WarpDbTestBase {
 			user.email = "name" + i + "@somewhere.org";
 			users[i] = user;
 		}
-		warpdb.save(users);
+		warpdb.save(Arrays.asList(users));
 		for (int i = 0; i < users.length; i++) {
 			User user = users[i];
 			assertTrue(user.callbacks.contains(PrePersist.class));
 			assertTrue(user.callbacks.contains(PostPersist.class));
 			assertEquals(String.format("%04d", i + 1), user.id);
 			assertEquals(user.createdAt, user.updatedAt);
-			assertEquals(System.currentTimeMillis(), user.createdAt, 500);
+			assertEquals(System.currentTimeMillis(), user.createdAt, 500.0);
 		}
 	}
 
@@ -41,12 +43,11 @@ public class WarpDbBatchSaveTest extends WarpDbTestBase {
 			ai.createdAt = System.currentTimeMillis();
 			ais[i] = ai;
 		}
-		warpdb.save(ais);
+		warpdb.save(Arrays.asList(ais));
 		for (int i = 0; i < ais.length; i++) {
 			AutoIncreamentEntity ai = ais[i];
 			assertEquals(i + 1, ai.id);
-			assertEquals(System.currentTimeMillis(), ai.createdAt, 500);
+			assertEquals(System.currentTimeMillis(), ai.createdAt, 500.0);
 		}
 	}
-
 }

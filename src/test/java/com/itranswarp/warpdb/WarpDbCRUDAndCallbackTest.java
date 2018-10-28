@@ -2,6 +2,7 @@ package com.itranswarp.warpdb;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.PostLoad;
@@ -28,7 +29,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		assertTrue(user.callbacks.contains(PostPersist.class));
 		assertEquals("0001", user.id);
 		assertEquals(user.createdAt, user.updatedAt);
-		assertEquals(System.currentTimeMillis(), user.createdAt, 500);
+		assertEquals(System.currentTimeMillis(), user.createdAt, 500.0);
 	}
 
 	@Test
@@ -44,7 +45,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		assertTrue(user.callbacks.contains(PreUpdate.class));
 		assertTrue(user.callbacks.contains(PostUpdate.class));
 		assertNotEquals(user.createdAt, user.updatedAt);
-		assertEquals(System.currentTimeMillis(), user.updatedAt, 500);
+		assertEquals(System.currentTimeMillis(), user.updatedAt, 500.0);
 		// fetch:
 		User bak = warpdb.fetch(User.class, user.id);
 		assertNotNull(bak);
@@ -97,7 +98,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		assertTrue(user.callbacks.contains(PreUpdate.class));
 		assertTrue(user.callbacks.contains(PostUpdate.class));
 		assertNotEquals(user.createdAt, user.updatedAt);
-		assertEquals(System.currentTimeMillis(), user.updatedAt, 500);
+		assertEquals(System.currentTimeMillis(), user.updatedAt, 500.0);
 		// fetch:
 		User bak = warpdb.fetch(User.class, user.id);
 		assertNotNull(bak);
@@ -141,6 +142,22 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		assertTrue(user.callbacks.contains(PreRemove.class));
 		assertTrue(user.callbacks.contains(PostRemove.class));
 		assertNull(warpdb.fetch(User.class, user.id));
+	}
+
+	@Test
+	public void testRemoveBeans() throws Exception {
+		User[] users = new User[5];
+		for (int i = 0; i < users.length; i++) {
+			User user = new User();
+			user.name = "Mr No." + i;
+			user.email = "no." + i + "@somewhere.org";
+			users[i] = user;
+		}
+		warpdb.save(Arrays.asList(users));
+		warpdb.remove(Arrays.asList(users));
+		assertTrue(users[0].callbacks.contains(PreRemove.class));
+		assertTrue(users[0].callbacks.contains(PostRemove.class));
+		assertNull(warpdb.fetch(User.class, users[0].id));
 	}
 
 }

@@ -167,12 +167,33 @@ public class WarpDb {
 	}
 
 	/**
+	 * Remove bean by id.
+	 * 
+	 * @param       <T> Generic type.
+	 * @param beans The entity.
+	 */
+	public <T> void remove(T bean) {
+		try {
+			Mapper<?> mapper = getMapper(bean.getClass());
+			mapper.preRemove.invoke(bean);
+			log.debug("SQL: " + mapper.deleteSQL);
+			jdbcTemplate.update(mapper.deleteSQL, mapper.id.convertGetter.get(bean));
+			mapper.postRemove.invoke(bean);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	/**
 	 * Remove beans by id.
 	 * 
 	 * @param       <T> Generic type.
 	 * @param beans The entities.
 	 */
-	public <T> void remove(@SuppressWarnings("unchecked") T... beans) {
+	public <T> void remove(List<T> beans) {
+		if (beans.isEmpty()) {
+			return;
+		}
 		try {
 			for (Object bean : beans) {
 				Mapper<?> mapper = getMapper(bean.getClass());
@@ -204,30 +225,67 @@ public class WarpDb {
 	}
 
 	/**
-	 * Update entities' updatable properties by id.
+	 * Update entity's updatable properties by id.
 	 * 
 	 * @param       <T> Generic type.
-	 * @param beans Entity objects.
+	 * @param beans Entity object.
 	 */
-	public <T> void update(@SuppressWarnings("unchecked") T... beans) {
+	public <T> void update(T bean) {
 		try {
-			for (T bean : beans) {
-				Mapper<?> mapper = getMapper(bean.getClass());
-				mapper.preUpdate.invoke(bean);
-				Object[] args = new Object[mapper.updatableProperties.size() + 1];
-				int n = 0;
-				for (AccessibleProperty prop : mapper.updatableProperties) {
-					args[n] = prop.convertGetter.get(bean);
-					n++;
-				}
-				args[n] = mapper.id.getter.get(bean);
-				log.debug("SQL: " + mapper.updateSQL);
-				jdbcTemplate.update(mapper.updateSQL, args);
-				mapper.postUpdate.invoke(bean);
+			Mapper<?> mapper = getMapper(bean.getClass());
+			mapper.preUpdate.invoke(bean);
+			Object[] args = new Object[mapper.updatableProperties.size() + 1];
+			int n = 0;
+			for (AccessibleProperty prop : mapper.updatableProperties) {
+				args[n] = prop.convertGetter.get(bean);
+				n++;
 			}
+			args[n] = mapper.id.getter.get(bean);
+			log.debug("SQL: " + mapper.updateSQL);
+			jdbcTemplate.update(mapper.updateSQL, args);
+			mapper.postUpdate.invoke(bean);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new PersistenceException(e);
 		}
+	}
+
+	/**
+	 * Update entities' updatable properties by id.
+	 * 
+	 * @param       <T> Generic type.
+	 * @param beans List of objects.
+	 */
+	public <T> void update(List<T> beans) {
+		if (beans.isEmpty()) {
+			return;
+		}
+		Mapper<?> mapper = getMapper(beans.iterator().next().getClass());
+		jdbcTemplate.execute(new ConnectionCallback<Object>() {
+			@Override
+			public Object doInConnection(Connection con) throws SQLException, DataAccessException {
+				try (PreparedStatement ps = con.prepareStatement(mapper.updateSQL)) {
+					for (T bean : beans) {
+						mapper.preUpdate.invoke(bean);
+						int n = 0;
+						for (AccessibleProperty prop : mapper.updatableProperties) {
+							Object arg = prop.convertGetter.get(bean);
+							n++;
+							ps.setObject(n, arg);
+						}
+						n++;
+						ps.setObject(n, mapper.id.getter.get(bean)); // where id = ?
+						ps.addBatch();
+					}
+					ps.executeBatch();
+					for (T bean : beans) {
+						mapper.postUpdate.invoke(bean);
+					}
+					return null;
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
 	}
 
 	/**
@@ -273,22 +331,14 @@ public class WarpDb {
 	 * Persist entity objects.
 	 * 
 	 * @param       <T> Generic type.
-	 * @param beans Entity objects.
+	 * @param beans List of objects.
 	 */
-	public <T> void save(@SuppressWarnings("unchecked") T... beans) {
-		if (beans.length == 0) {
+	public <T> void save(List<T> beans) {
+		if (beans.isEmpty()) {
 			return;
 		}
-		if (beans.length == 1) {
-			saveOne(beans[0]);
-		} else {
-			saveBatch(beans);
-		}
-	}
-
-	<T> void saveBatch(@SuppressWarnings("unchecked") T... beans) {
 		try {
-			Mapper<?> mapper = getMapper(beans[0].getClass());
+			Mapper<?> mapper = getMapper(beans.iterator().next().getClass());
 			jdbcTemplate.execute(new ConnectionCallback<Object>() {
 				@Override
 				public Object doInConnection(Connection con) throws SQLException, DataAccessException {
@@ -332,7 +382,13 @@ public class WarpDb {
 		}
 	}
 
-	<T> void saveOne(T bean) {
+	/**
+	 * Persist entity object.
+	 * 
+	 * @param       <T> Generic type.
+	 * @param beans Entity object.
+	 */
+	public <T> void save(T bean) {
 		try {
 			Mapper<?> mapper = getMapper(bean.getClass());
 			mapper.prePersist.invoke(bean);
@@ -374,7 +430,7 @@ public class WarpDb {
 	 * @param args The arguments that match the SQL.
 	 * @return int result of update.
 	 */
-	public int update(String sql, Object... args) {
+	public int updateSql(String sql, Object... args) {
 		return jdbcTemplate.update(sql, args);
 	}
 
