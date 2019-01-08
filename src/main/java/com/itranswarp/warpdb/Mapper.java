@@ -52,6 +52,7 @@ final class Mapper<T> {
 
 	final String selectSQL;
 	final String insertSQL;
+	final String insertIgnoreSQL;
 	final String updateSQL;
 	final String deleteSQL;
 
@@ -126,10 +127,11 @@ final class Mapper<T> {
 
 		this.selectSQL = "SELECT * FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
 
-		this.insertSQL = "INSERT INTO " + this.tableName + " ("
-				+ String.join(", ", this.insertableProperties.stream().map((p) -> {
-					return p.columnName;
-				}).toArray(String[]::new)) + ") VALUES (" + numOfQuestions(this.insertableProperties.size()) + ")";
+		String insertPostfix = this.tableName + " (" + String.join(", ", this.insertableProperties.stream().map((p) -> {
+			return p.columnName;
+		}).toArray(String[]::new)) + ") VALUES (" + numOfQuestions(this.insertableProperties.size()) + ")";
+		this.insertSQL = "INSERT INTO " + insertPostfix;
+		this.insertIgnoreSQL = "INSERT IGNORE INTO " + insertPostfix;
 
 		this.updateSQL = "UPDATE " + this.tableName + " SET "
 				+ String.join(", ", this.updatableProperties.stream().map((p) -> {

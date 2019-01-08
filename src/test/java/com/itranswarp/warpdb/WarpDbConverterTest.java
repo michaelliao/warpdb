@@ -21,7 +21,7 @@ public class WarpDbConverterTest extends WarpDbTestBase {
 		todo.targetDate = LocalDate.of(2016, 10, 20);
 		todo.targetDateTime = LocalDateTime.of(2016, 10, 20, 11, 12, 13);
 		todo.address = new Address("Beijing", "No.1 Road", "100101");
-		warpdb.save(todo);
+		warpdb.insert(todo);
 		// query:
 		TodoEntity bak = warpdb.fetch(TodoEntity.class, todo.id);
 		assertNotNull(bak);
@@ -51,7 +51,7 @@ public class WarpDbConverterTest extends WarpDbTestBase {
 		todo.targetDate = LocalDate.of(2016, 10, 20);
 		todo.targetDateTime = LocalDateTime.of(2016, 10, 20, 11, 12, 13);
 		todo.address = null;
-		warpdb.save(todo);
+		warpdb.insert(todo);
 		// query:
 		TodoEntity bak = warpdb.fetch(TodoEntity.class, todo.id);
 		assertNotNull(bak);
@@ -73,7 +73,7 @@ public class WarpDbConverterTest extends WarpDbTestBase {
 		todo.targetDate = LocalDate.of(2016, 10, 20);
 		todo.targetDateTime = LocalDateTime.of(2016, 10, 20, 11, 12, 13);
 		todo.address = null;
-		warpdb.save(todo);
+		warpdb.insert(todo);
 		// query:
 		List<TodoEntity> list = warpdb.from(TodoEntity.class).where("targetDate>?", LocalDate.of(2016, 10, 19)).list();
 		assertEquals(1, list.size());

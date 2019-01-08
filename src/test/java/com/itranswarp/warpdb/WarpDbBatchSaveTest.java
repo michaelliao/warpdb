@@ -23,7 +23,7 @@ public class WarpDbBatchSaveTest extends WarpDbTestBase {
 			user.email = "name" + i + "@somewhere.org";
 			users[i] = user;
 		}
-		warpdb.save(Arrays.asList(users));
+		warpdb.insert(Arrays.asList(users));
 		for (int i = 0; i < users.length; i++) {
 			User user = users[i];
 			assertTrue(user.callbacks.contains(PrePersist.class));
@@ -43,7 +43,7 @@ public class WarpDbBatchSaveTest extends WarpDbTestBase {
 			ai.createdAt = System.currentTimeMillis();
 			ais[i] = ai;
 		}
-		warpdb.save(Arrays.asList(ais));
+		warpdb.insert(Arrays.asList(ais));
 		for (int i = 0; i < ais.length; i++) {
 			AutoIncreamentEntity ai = ais[i];
 			assertEquals(i + 1, ai.id);

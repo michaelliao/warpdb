@@ -24,7 +24,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		User user = new User();
 		user.name = "Michael";
 		user.email = "michael@somewhere.org";
-		warpdb.save(user);
+		warpdb.insert(user);
 		assertTrue(user.callbacks.contains(PrePersist.class));
 		assertTrue(user.callbacks.contains(PostPersist.class));
 		assertEquals("0001", user.id);
@@ -37,7 +37,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		User user = new User();
 		user.name = "Michael";
 		user.email = "michael@somewhere.org";
-		warpdb.save(user);
+		warpdb.insert(user);
 		Thread.sleep(100);
 		user.name = "Changed";
 		user.email = "changed@somewhere.org";
@@ -66,7 +66,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 			user.id = ids[i];
 			user.name = "Mr No." + i;
 			user.email = "no." + i + "@somewhere.org";
-			warpdb.save(user);
+			warpdb.insert(user);
 		}
 		// test get & fetch:
 		User u1 = warpdb.get(User.class, ids[0]);
@@ -90,7 +90,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		User user = new User();
 		user.name = "Michael";
 		user.email = "michael@somewhere.org";
-		warpdb.save(user);
+		warpdb.insert(user);
 		Thread.sleep(100);
 		user.name = "Changed";
 		user.version = 99;
@@ -113,7 +113,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		User user = new User();
 		user.name = "Michael";
 		user.email = "michael@somewhere.org";
-		warpdb.save(user);
+		warpdb.insert(user);
 		user.name = "Changed";
 		user.version = 99;
 		// createdAt is not updatable:
@@ -125,7 +125,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		User user = new User();
 		user.name = "Michael";
 		user.email = "michael@somewhere.org";
-		warpdb.save(user);
+		warpdb.insert(user);
 		user.name = "Changed";
 		user.version = 99;
 		// role is not exist:
@@ -137,7 +137,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 		User user = new User();
 		user.name = "Michael";
 		user.email = "michael@somewhere.org";
-		warpdb.save(user);
+		warpdb.insert(user);
 		warpdb.remove(user);
 		assertTrue(user.callbacks.contains(PreRemove.class));
 		assertTrue(user.callbacks.contains(PostRemove.class));
@@ -153,7 +153,7 @@ public class WarpDbCRUDAndCallbackTest extends WarpDbTestBase {
 			user.email = "no." + i + "@somewhere.org";
 			users[i] = user;
 		}
-		warpdb.save(Arrays.asList(users));
+		warpdb.insert(Arrays.asList(users));
 		warpdb.remove(Arrays.asList(users));
 		assertTrue(users[0].callbacks.contains(PreRemove.class));
 		assertTrue(users[0].callbacks.contains(PostRemove.class));

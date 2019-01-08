@@ -18,7 +18,7 @@ public class WarpDbIdentityIdTest extends WarpDbTestBase {
 		}
 		int n = 0;
 		for (AutoIncreamentEntity e : es) {
-			warpdb.save(e);
+			warpdb.insert(e);
 			n++;
 			assertEquals(n, e.id);
 		}

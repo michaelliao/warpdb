@@ -15,7 +15,7 @@ public class WarpDbEnumTest extends WarpDbTestBase {
 		ee.id = EnumEntity.nextId();
 		ee.name = "Bob";
 		ee.roleName = Role.ADMIN;
-		warpdb.save(ee);
+		warpdb.insert(ee);
 		// query:
 		EnumEntity bak = warpdb.fetch(EnumEntity.class, ee.id);
 		assertNotNull(bak);
@@ -28,7 +28,7 @@ public class WarpDbEnumTest extends WarpDbTestBase {
 		ee.id = EnumEntity.nextId();
 		ee.name = "Bob";
 		ee.roleName = null;
-		warpdb.save(ee);
+		warpdb.insert(ee);
 		// query:
 		EnumEntity bak = warpdb.fetch(EnumEntity.class, ee.id);
 		assertNotNull(bak);
@@ -41,7 +41,7 @@ public class WarpDbEnumTest extends WarpDbTestBase {
 		ee.id = EnumEntity.nextId();
 		ee.name = "Bob";
 		ee.roleName = Role.ADMIN;
-		warpdb.save(ee);
+		warpdb.insert(ee);
 		// query:
 		EnumEntity bak = warpdb.from(EnumEntity.class).where("roleName = ?", Role.ADMIN).first();
 		assertNotNull(bak);

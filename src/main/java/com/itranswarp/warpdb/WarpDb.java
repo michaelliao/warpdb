@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -328,23 +329,52 @@ public class WarpDb {
 	}
 
 	/**
+	 * Alias of insert().
+	 * 
+	 * @param       <T> Generic type.
+	 * @param beans List of objects.
+	 */
+	@Deprecated
+	public <T> void save(List<T> beans) {
+		insert(beans);
+	}
+
+	/**
 	 * Persist entity objects.
 	 * 
 	 * @param       <T> Generic type.
 	 * @param beans List of objects.
 	 */
-	public <T> void save(List<T> beans) {
+	public <T> void insert(List<T> beans) {
 		if (beans.isEmpty()) {
 			return;
 		}
+		doInsert(getMapper(beans.iterator().next().getClass()), false, beans);
+	}
+
+	/**
+	 * Persist entity objects, ignore exist rows.
+	 * 
+	 * @param       <T> Generic type.
+	 * @param beans List of objects.
+	 */
+	public <T> void insertIgnore(List<T> beans) {
+		if (beans.isEmpty()) {
+			return;
+		}
+		doInsert(getMapper(beans.iterator().next().getClass()), true, beans);
+	}
+
+	private <T> void doInsert(Mapper<?> mapper, boolean ignore, List<T> beans) {
+		final String sql = ignore ? mapper.insertIgnoreSQL : mapper.insertSQL;
+		log.debug("SQL: " + sql);
 		try {
-			Mapper<?> mapper = getMapper(beans.iterator().next().getClass());
 			jdbcTemplate.execute(new ConnectionCallback<Object>() {
 				@Override
 				public Object doInConnection(Connection con) throws SQLException, DataAccessException {
 					try (PreparedStatement ps = mapper.id.isIdentityId()
-							? con.prepareStatement(mapper.insertSQL, Statement.RETURN_GENERATED_KEYS)
-							: con.prepareStatement(mapper.insertSQL)) {
+							? con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+							: con.prepareStatement(sql)) {
 						for (T bean : beans) {
 							mapper.prePersist.invoke(bean);
 							int n = 0;
@@ -355,15 +385,20 @@ public class WarpDb {
 							}
 							ps.addBatch();
 						}
-						ps.executeBatch();
+						int[] results = ps.executeBatch();
 						if (mapper.id.isIdentityId()) {
 							// using identityId:
 							try (ResultSet rs = ps.getGeneratedKeys()) {
+								int n = 0;
 								for (T bean : beans) {
-									if (rs.next()) {
-										mapper.id.convertSetter.set(bean, rs.getObject(1));
-									} else {
-										throw new RuntimeException("Not enough id returned.");
+									int result = results[n];
+									n++;
+									if (result == Statement.RETURN_GENERATED_KEYS) {
+										if (rs.next()) {
+											mapper.id.convertSetter.set(bean, rs.getObject(1));
+										} else {
+											throw new RuntimeException("Not enough id returned.");
+										}
 									}
 								}
 							}
@@ -383,14 +418,42 @@ public class WarpDb {
 	}
 
 	/**
+	 * Alias of insert().
+	 * 
+	 * @param       <T> Generic type.
+	 * @param beans Entity object.
+	 */
+	@Deprecated
+	public <T> void save(T bean) {
+		insert(bean);
+	}
+
+	/**
 	 * Persist entity object.
 	 * 
 	 * @param       <T> Generic type.
 	 * @param beans Entity object.
 	 */
-	public <T> void save(T bean) {
+	public <T> void insert(T bean) {
+		doInsert(false, bean);
+	}
+
+	/**
+	 * Persist entity object. Ignore if exist. Return true if insert ok, otherwise
+	 * ignored.
+	 * 
+	 * @param       <T> Generic type.
+	 * @param beans Entity object.
+	 */
+	public <T> boolean insertIgnore(T bean) {
+		return doInsert(true, bean);
+	}
+
+	private <T> boolean doInsert(boolean ignore, T bean) {
 		try {
-			Mapper<?> mapper = getMapper(bean.getClass());
+			int rows;
+			final Mapper<?> mapper = getMapper(bean.getClass());
+			final String sql = ignore ? mapper.insertIgnoreSQL : mapper.insertSQL;
 			mapper.prePersist.invoke(bean);
 			Object[] args = new Object[mapper.insertableProperties.size()];
 			int n = 0;
@@ -398,26 +461,28 @@ public class WarpDb {
 				args[n] = prop.convertGetter.get(bean);
 				n++;
 			}
-			log.debug("SQL: " + mapper.insertSQL);
+			log.debug("SQL: " + sql);
 			if (mapper.id.isIdentityId()) {
 				// using identityId:
 				KeyHolder keyHolder = new GeneratedKeyHolder();
-				jdbcTemplate.update(new PreparedStatementCreator() {
+				rows = jdbcTemplate.update(new PreparedStatementCreator() {
 					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-						PreparedStatement ps = connection.prepareStatement(mapper.insertSQL,
-								Statement.RETURN_GENERATED_KEYS);
+						PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 						for (int i = 0; i < args.length; i++) {
 							ps.setObject(i + 1, args[i]);
 						}
 						return ps;
 					}
 				}, keyHolder);
-				mapper.id.convertSetter.set(bean, keyHolder.getKey());
+				if (rows == 1) {
+					mapper.id.convertSetter.set(bean, keyHolder.getKey());
+				}
 			} else {
 				// id is specified:
-				jdbcTemplate.update(mapper.insertSQL, args);
+				rows = jdbcTemplate.update(sql, args);
 			}
 			mapper.postPersist.invoke(bean);
+			return rows == 1;
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new PersistenceException(e);
 		}
@@ -550,6 +615,15 @@ public class WarpDb {
 			throw new NonUniqueResultException("Non unique result returned from SQL: " + sql);
 		}
 		return list.get(0);
+	}
+
+	/**
+	 * Get entity classes as List.
+	 *
+	 * @return List of entity classes.
+	 */
+	public List<Class<?>> getEntities() {
+		return new ArrayList<>(this.classMapping.keySet());
 	}
 
 	/**

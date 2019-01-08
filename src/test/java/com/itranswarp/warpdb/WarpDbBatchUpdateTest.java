@@ -21,7 +21,7 @@ public class WarpDbBatchUpdateTest extends WarpDbTestBase {
 			user.email = "name" + i + "@somewhere.org";
 			users[i] = user;
 		}
-		warpdb.save(Arrays.asList(users));
+		warpdb.insert(Arrays.asList(users));
 		long ts = System.currentTimeMillis();
 		for (int i = 0; i < users.length; i++) {
 			User user = users[i];

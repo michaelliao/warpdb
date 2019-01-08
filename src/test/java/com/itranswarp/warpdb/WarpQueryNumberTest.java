@@ -24,7 +24,7 @@ public class WarpQueryNumberTest extends WarpDbTestBase {
 			u.score = 20 + i;
 			// tag = "A" or "B":
 			u.tag = i % 2 == 0 ? "A" : "B";
-			warpdb.save(u);
+			warpdb.insert(u);
 		}
 	}
 

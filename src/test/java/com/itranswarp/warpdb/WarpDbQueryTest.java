@@ -21,7 +21,7 @@ public class WarpDbQueryTest extends WarpDbTestBase {
 			u.email = id.toLowerCase() + "@somewhere.org";
 			// tag = "A" or "B":
 			u.tag = id.substring(0, 1);
-			warpdb.save(u);
+			warpdb.insert(u);
 		}
 	}
 

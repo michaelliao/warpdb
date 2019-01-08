@@ -16,7 +16,7 @@ public class WarpDbDecimalTest extends WarpDbTestBase {
 		e.id = DecimalEntity.nextId();
 		e.name = "Bob";
 		e.balance = new BigDecimal("12.345");
-		warpdb.save(e);
+		warpdb.insert(e);
 		// query:
 		DecimalEntity bak = warpdb.fetch(DecimalEntity.class, e.id);
 		assertNotNull(bak);
@@ -31,7 +31,7 @@ public class WarpDbDecimalTest extends WarpDbTestBase {
 		e.id = DecimalEntity.nextId();
 		e.name = "Bob";
 		e.balance = null;
-		warpdb.save(e);
+		warpdb.insert(e);
 		// query:
 		DecimalEntity bak = warpdb.fetch(DecimalEntity.class, e.id);
 		assertNotNull(bak);

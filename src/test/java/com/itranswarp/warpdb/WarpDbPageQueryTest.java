@@ -16,7 +16,7 @@ public class WarpDbPageQueryTest extends WarpDbTestBase {
 			u.id = String.format("A-%02d", i);
 			u.name = "Mr " + i;
 			u.email = "A" + i + "@somewhere.org";
-			warpdb.save(u);
+			warpdb.insert(u);
 		}
 	}
 
