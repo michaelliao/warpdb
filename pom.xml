@@ -130,8 +130,9 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-							<!-- disable checking -->
-							<additionalparam>-Xdoclint:none</additionalparam>
+							<additionalOption>
+								<additionalOption>-Xdoclint:none</additionalOption>
+							</additionalOption>
 						</configuration>
 					</execution>
 				</executions>
