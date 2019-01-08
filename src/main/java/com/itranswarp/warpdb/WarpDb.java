@@ -170,8 +170,7 @@ public class WarpDb {
 	/**
 	 * Remove bean by id.
 	 * 
-	 * @param       <T> Generic type.
-	 * @param beans The entity.
+	 * @param bean The entity.
 	 */
 	public <T> void remove(T bean) {
 		try {
@@ -188,7 +187,6 @@ public class WarpDb {
 	/**
 	 * Remove beans by id.
 	 * 
-	 * @param       <T> Generic type.
 	 * @param beans The entities.
 	 */
 	public <T> void remove(List<T> beans) {
@@ -228,8 +226,8 @@ public class WarpDb {
 	/**
 	 * Update entity's updatable properties by id.
 	 * 
-	 * @param       <T> Generic type.
-	 * @param beans Entity object.
+	 * @param      <T> Generic type.
+	 * @param bean Entity object.
 	 */
 	public <T> void update(T bean) {
 		try {
@@ -331,7 +329,7 @@ public class WarpDb {
 	/**
 	 * Alias of insert().
 	 * 
-	 * @param       <T> Generic type.
+	 * @param      <T> Generic type.
 	 * @param beans List of objects.
 	 */
 	@Deprecated
@@ -420,8 +418,8 @@ public class WarpDb {
 	/**
 	 * Alias of insert().
 	 * 
-	 * @param       <T> Generic type.
-	 * @param beans Entity object.
+	 * @param      <T> Generic type.
+	 * @param bean Entity object.
 	 */
 	@Deprecated
 	public <T> void save(T bean) {
@@ -431,8 +429,8 @@ public class WarpDb {
 	/**
 	 * Persist entity object.
 	 * 
-	 * @param       <T> Generic type.
-	 * @param beans Entity object.
+	 * @param      <T> Generic type.
+	 * @param bean Entity object.
 	 */
 	public <T> void insert(T bean) {
 		doInsert(false, bean);
@@ -442,8 +440,8 @@ public class WarpDb {
 	 * Persist entity object. Ignore if exist. Return true if insert ok, otherwise
 	 * ignored.
 	 * 
-	 * @param       <T> Generic type.
-	 * @param beans Entity object.
+	 * @param      <T> Generic type.
+	 * @param bean Entity object.
 	 */
 	public <T> boolean insertIgnore(T bean) {
 		return doInsert(true, bean);
