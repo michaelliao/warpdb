@@ -329,7 +329,7 @@ public class WarpDb {
 	/**
 	 * Alias of insert().
 	 * 
-	 * @param      <T> Generic type.
+	 * @param       <T> Generic type.
 	 * @param beans List of objects.
 	 */
 	@Deprecated
@@ -636,6 +636,46 @@ public class WarpDb {
 			throw new RuntimeException("Target class is not a registered entity: " + clazz.getName());
 		}
 		return mapper.tableName;
+	}
+
+	/**
+	 * Get insertable field names.
+	 * 
+	 * @param clazz Entity class.
+	 * @return String array of fields.
+	 */
+	public String[] getInsertableFields(Class<?> clazz) {
+		Mapper<?> mapper = (Mapper<?>) this.classMapping.get(clazz);
+		if (mapper == null) {
+			throw new RuntimeException("Target class is not a registered entity: " + clazz.getName());
+		}
+		return mapper.insertableProperties.stream().map(p -> p.columnName).toArray(String[]::new);
+	}
+
+	/**
+	 * Get insertable values of the bean. Same sequence with field name. NOTE all
+	 * values are converted into db-ready value already. e.g. enum is converted to
+	 * String.
+	 * 
+	 * @param bean The entity bean.
+	 * @return Object array of values.
+	 */
+	public <T> Object[] getInsertableValues(T bean) {
+		Mapper<?> mapper = (Mapper<?>) this.classMapping.get(bean.getClass());
+		if (mapper == null) {
+			throw new RuntimeException("Target class is not a registered entity: " + bean.getClass().getName());
+		}
+		Object[] args = new Object[mapper.insertableProperties.size()];
+		int n = 0;
+		try {
+			for (AccessibleProperty prop : mapper.insertableProperties) {
+				args[n] = prop.convertGetter.get(bean);
+				n++;
+			}
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new PersistenceException(e);
+		}
+		return args;
 	}
 
 	// get mapper by class:
