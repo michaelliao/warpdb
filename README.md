@@ -28,7 +28,7 @@ Maven dependency:
 <dependency>
     <groupId>com.itranswarp</groupId>
     <artifactId>warpdb</artifactId>
-    <version>4.2</version>
+    <version>4.3</version>
 </dependency>
 ```
 
@@ -90,6 +90,12 @@ User user = warpdb.get(User.class, "123");
 User another = warpdb.fetch(User.class, "456");
 ```
 
+You have to provide multiple values if multiple id columns are defined:
+
+```
+Product p = warpdb.get(Product.class, "p123", "c456);
+```
+
 Warpdb supports criteria query and raw SQL query, both are type-safe:
 
 ```
@@ -145,9 +151,9 @@ SELECT COUNT(*) FROM User;
 SELECT * FROM User ORDER BY updatedAt limit 20, 10
 ```
 
-### Save
+### Insert
 
-Using `save()` to insert one or more entities:
+Using `insert()` to insert one or more entities:
 
 ```
 User user = new User();
@@ -156,12 +162,12 @@ user.setName(...);
 Product product = new Product();
 product.setId(...);
 product.setName(...);
-warpdb.save(user, product);
+warpdb.insert(user, product);
 ```
 
-### Batch save
+### Batch insert
 
-Using `save(List<T>)` to do batch save entities.
+Using `insert(List<T>)` to do batch save entities.
 
 ### Update
 
@@ -244,9 +250,14 @@ public class User {
 
 ### Schema Export
 
-Using `ddl()` to export schema:
+Using `getDDL()` to export schema:
 
 ```
-String ddl = warpdb.ddl();
+String ddl = warpdb.getDDL();
 ```
 
+or get schema for one entity:
+
+```
+String ddl = warpdb.getDDL(User.class);
+```
