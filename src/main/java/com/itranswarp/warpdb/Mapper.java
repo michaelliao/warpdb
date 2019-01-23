@@ -32,7 +32,7 @@ final class Mapper<T> {
 	final String tableName;
 
 	// @Id property:
-	final AccessibleProperty id;
+	final AccessibleProperty[] ids;
 	// @Version property:
 	final AccessibleProperty version;
 
@@ -55,6 +55,7 @@ final class Mapper<T> {
 	final String insertIgnoreSQL;
 	final String updateSQL;
 	final String deleteSQL;
+	final String whereIdsEquals;
 
 	final Listener prePersist;
 	final Listener preUpdate;
@@ -92,8 +93,10 @@ final class Mapper<T> {
 		if (ids.length == 0) {
 			throw new ConfigurationException("No @Id found.");
 		}
-		if (ids.length > 1) {
-			throw new ConfigurationException("Multiple @Id found.");
+		if (ids.length > 1 && all.stream().filter((p) -> {
+			return p.isId() && p.isIdentityId();
+		}).count() > 0) {
+			throw new ConfigurationException("Mutiple @Id cannot be identity.");
 		}
 		// get @Version:
 		AccessibleProperty[] versions = all.stream().filter((p) -> {
@@ -121,11 +124,14 @@ final class Mapper<T> {
 		this.updatablePropertiesMap = buildPropertiesMap(this.updatableProperties);
 
 		// init:
-		this.id = ids[0];
+		this.ids = ids;
 		this.entityClass = clazz;
 		this.tableName = getTableName(clazz);
 
-		this.selectSQL = "SELECT * FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
+		this.whereIdsEquals = String.join(" AND ",
+				Arrays.stream(this.ids).map(id -> id.columnName + " = ?").toArray(String[]::new));
+
+		this.selectSQL = "SELECT * FROM " + this.tableName + " WHERE " + this.whereIdsEquals;
 
 		String insertPostfix = this.tableName + " (" + String.join(", ", this.insertableProperties.stream().map((p) -> {
 			return p.columnName;
@@ -136,9 +142,9 @@ final class Mapper<T> {
 		this.updateSQL = "UPDATE " + this.tableName + " SET "
 				+ String.join(", ", this.updatableProperties.stream().map((p) -> {
 					return p.columnName + " = ?";
-				}).toArray(String[]::new)) + " WHERE " + this.id.columnName + " = ?";
+				}).toArray(String[]::new)) + " WHERE " + this.whereIdsEquals;
 
-		this.deleteSQL = "DELETE FROM " + this.tableName + " WHERE " + this.id.columnName + " = ?";
+		this.deleteSQL = "DELETE FROM " + this.tableName + " WHERE " + this.whereIdsEquals;
 
 		this.rowMapper = new BeanRowMapper<>(this.entityClass, this.allProperties);
 
@@ -205,7 +211,9 @@ final class Mapper<T> {
 		// add index:
 		sb.append(getIndex());
 		// add primary key:
-		sb.append("  PRIMARY KEY(").append(this.id.columnName).append(")\n");
+		sb.append("  PRIMARY KEY(")
+				.append(String.join(", ", Arrays.stream(this.ids).map(id -> id.columnName).toArray(String[]::new)))
+				.append(")\n");
 		sb.append(");\n");
 		return sb.toString();
 	}
@@ -241,6 +249,14 @@ final class Mapper<T> {
 			});
 		}
 		return "";
+	}
+
+	Object[] getIdsValue(Object bean) throws IllegalAccessException, InvocationTargetException {
+		Object[] values = new Object[this.ids.length];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = this.ids[i].convertGetter.get(bean);
+		}
+		return values;
 	}
 
 	Map<String, AccessibleProperty> buildPropertiesMap(List<AccessibleProperty> props) {

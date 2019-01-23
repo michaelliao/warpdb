@@ -120,10 +120,10 @@ public class WarpDb {
 	 * 
 	 * @return DDL as SQL string.
 	 */
-	public String exportSchema() {
-		return String.join("\n\n", this.tableMapping.values().stream().map((mapper) -> {
+	public String getDDL() {
+		return String.join("\n\n", this.classMapping.values().stream().map((mapper) -> {
 			return mapper.ddl();
-		}).toArray(String[]::new));
+		}).sorted().toArray(String[]::new));
 	}
 
 	/**
@@ -144,6 +144,23 @@ public class WarpDb {
 	}
 
 	/**
+	 * Get a model instance by class type and ids. EntityNotFoundException is thrown
+	 * if not found.
+	 * 
+	 * @param       <T> Generic type.
+	 * @param clazz Entity class.
+	 * @param id    Id value.
+	 * @return Entity bean found by id.
+	 */
+	public <T> T get(Class<T> clazz, Serializable... ids) {
+		T t = fetch(clazz, ids);
+		if (t == null) {
+			throw new EntityNotFoundException(clazz.getSimpleName());
+		}
+		return t;
+	}
+
+	/**
 	 * Get a model instance by class type and id. Return null if not found.
 	 * 
 	 * @param       <T> Generic type.
@@ -153,8 +170,39 @@ public class WarpDb {
 	 */
 	public <T> T fetch(Class<T> clazz, Serializable id) {
 		Mapper<T> mapper = getMapper(clazz);
+		if (mapper.ids.length != 1) {
+			throw new IllegalArgumentException(mapper.ids.length + " id values are expected but actual 1.");
+		}
 		log.debug("SQL: " + mapper.selectSQL);
 		List<T> list = (List<T>) jdbcTemplate.query(mapper.selectSQL, new Object[] { id }, mapper.rowMapper);
+		if (list.isEmpty()) {
+			return null;
+		}
+		T t = list.get(0);
+		try {
+			mapper.postLoad.invoke(t);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new PersistenceException(e);
+		}
+		return t;
+	}
+
+	/**
+	 * Get a model instance by class type and ids. Return null if not found.
+	 * 
+	 * @param       <T> Generic type.
+	 * @param clazz Entity class.
+	 * @param ids   Id values.
+	 * @return Entity bean found by id.
+	 */
+	public <T> T fetch(Class<T> clazz, Serializable... ids) {
+		Mapper<T> mapper = getMapper(clazz);
+		if (mapper.ids.length != ids.length) {
+			throw new IllegalArgumentException(
+					mapper.ids.length + " id values are expected but actual " + ids.length + ".");
+		}
+		log.debug("SQL: " + mapper.selectSQL);
+		List<T> list = (List<T>) jdbcTemplate.query(mapper.selectSQL, ids, mapper.rowMapper);
 		if (list.isEmpty()) {
 			return null;
 		}
@@ -177,7 +225,7 @@ public class WarpDb {
 			Mapper<?> mapper = getMapper(bean.getClass());
 			mapper.preRemove.invoke(bean);
 			log.debug("SQL: " + mapper.deleteSQL);
-			jdbcTemplate.update(mapper.deleteSQL, mapper.id.convertGetter.get(bean));
+			jdbcTemplate.update(mapper.deleteSQL, mapper.getIdsValue(bean));
 			mapper.postRemove.invoke(bean);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new PersistenceException(e);
@@ -198,7 +246,7 @@ public class WarpDb {
 				Mapper<?> mapper = getMapper(bean.getClass());
 				mapper.preRemove.invoke(bean);
 				log.debug("SQL: " + mapper.deleteSQL);
-				jdbcTemplate.update(mapper.deleteSQL, mapper.id.convertGetter.get(bean));
+				jdbcTemplate.update(mapper.deleteSQL, mapper.getIdsValue(bean));
 				mapper.postRemove.invoke(bean);
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -233,13 +281,16 @@ public class WarpDb {
 		try {
 			Mapper<?> mapper = getMapper(bean.getClass());
 			mapper.preUpdate.invoke(bean);
-			Object[] args = new Object[mapper.updatableProperties.size() + 1];
+			Object[] args = new Object[mapper.updatableProperties.size() + mapper.ids.length];
 			int n = 0;
 			for (AccessibleProperty prop : mapper.updatableProperties) {
 				args[n] = prop.convertGetter.get(bean);
 				n++;
 			}
-			args[n] = mapper.id.getter.get(bean);
+			for (int i = 0; i < mapper.ids.length; i++) {
+				args[n] = mapper.ids[i].convertGetter.get(bean);
+				n++;
+			}
 			log.debug("SQL: " + mapper.updateSQL);
 			jdbcTemplate.update(mapper.updateSQL, args);
 			mapper.postUpdate.invoke(bean);
@@ -271,8 +322,10 @@ public class WarpDb {
 							n++;
 							ps.setObject(n, arg);
 						}
-						n++;
-						ps.setObject(n, mapper.id.getter.get(bean)); // where id = ?
+						for (int i = 0; i < mapper.ids.length; i++) {
+							n++;
+							ps.setObject(n, mapper.ids[i].convertGetter.get(bean)); // where id = ?
+						}
 						ps.addBatch();
 					}
 					ps.executeBatch();
@@ -301,7 +354,7 @@ public class WarpDb {
 		Mapper<?> mapper = getMapper(bean.getClass());
 		try {
 			mapper.preUpdate.invoke(bean);
-			Object[] args = new Object[properties.length + 1];
+			Object[] args = new Object[properties.length + mapper.ids.length];
 			StringBuilder sb = new StringBuilder(150);
 			sb.append("UPDATE ").append(mapper.tableName).append(" SET ");
 			int n = 0;
@@ -314,9 +367,12 @@ public class WarpDb {
 				args[n] = ap.convertGetter.get(bean);
 				n++;
 			}
-			args[n] = mapper.id.getter.get(bean);
+			for (int i = 0; i < mapper.ids.length; i++) {
+				args[n] = mapper.ids[i].convertGetter.get(bean);
+				n++;
+			}
 			sb.delete(sb.length() - 2, sb.length());
-			sb.append(" WHERE ").append(mapper.id.columnName).append(" = ?");
+			sb.append(" WHERE ").append(mapper.whereIdsEquals);
 			String sql = sb.toString();
 			log.debug("SQL: " + sql);
 			jdbcTemplate.update(sql, args);
@@ -370,7 +426,7 @@ public class WarpDb {
 			jdbcTemplate.execute(new ConnectionCallback<Object>() {
 				@Override
 				public Object doInConnection(Connection con) throws SQLException, DataAccessException {
-					try (PreparedStatement ps = mapper.id.isIdentityId()
+					try (PreparedStatement ps = mapper.ids[0].isIdentityId()
 							? con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
 							: con.prepareStatement(sql)) {
 						for (T bean : beans) {
@@ -384,7 +440,7 @@ public class WarpDb {
 							ps.addBatch();
 						}
 						int[] results = ps.executeBatch();
-						if (mapper.id.isIdentityId()) {
+						if (mapper.ids[0].isIdentityId()) {
 							// using identityId:
 							try (ResultSet rs = ps.getGeneratedKeys()) {
 								int n = 0;
@@ -393,7 +449,7 @@ public class WarpDb {
 									n++;
 									if (result == Statement.RETURN_GENERATED_KEYS) {
 										if (rs.next()) {
-											mapper.id.convertSetter.set(bean, rs.getObject(1));
+											mapper.ids[0].convertSetter.set(bean, rs.getObject(1));
 										} else {
 											throw new RuntimeException("Not enough id returned.");
 										}
@@ -460,7 +516,7 @@ public class WarpDb {
 				n++;
 			}
 			log.debug("SQL: " + sql);
-			if (mapper.id.isIdentityId()) {
+			if (mapper.ids[0].isIdentityId()) {
 				// using identityId:
 				KeyHolder keyHolder = new GeneratedKeyHolder();
 				rows = jdbcTemplate.update(new PreparedStatementCreator() {
@@ -473,7 +529,7 @@ public class WarpDb {
 					}
 				}, keyHolder);
 				if (rows == 1) {
-					mapper.id.convertSetter.set(bean, keyHolder.getKey());
+					mapper.ids[0].convertSetter.set(bean, keyHolder.getKey());
 				}
 			} else {
 				// id is specified:

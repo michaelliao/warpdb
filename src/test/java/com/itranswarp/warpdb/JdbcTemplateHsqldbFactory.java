@@ -67,7 +67,7 @@ public class JdbcTemplateHsqldbFactory {
 			WarpDb warpdb = new WarpDb();
 			warpdb.setBasePackages(Arrays.asList("com.itranswarp.warpdb.test"));
 			warpdb.init();
-			return warpdb.exportSchema();
+			return warpdb.getDDL();
 		}
 		return ddl;
 	}

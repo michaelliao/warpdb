@@ -53,12 +53,6 @@ class AccessibleProperty {
 	// column DDL:
 	final String columnDefinition;
 
-	// getter function:
-	final PropertyGetter getter;
-
-	// setter function:
-	final PropertySetter setter;
-
 	// getter and do convert if necessary:
 	final PropertyGetter convertGetter;
 
@@ -155,16 +149,14 @@ class AccessibleProperty {
 		this.propertyName = propertyName;
 		this.columnName = columnName;
 		this.columnDefinition = columnDefinition;
-		this.getter = getter;
-		this.convertGetter = (bean) -> {
+		this.convertGetter = this.converter == null ? getter : (bean) -> {
 			Object value = getter.get(bean);
-			if (value != null && this.converter != null) {
+			if (value != null) {
 				value = this.converter.convertToDatabaseColumn(value);
 			}
 			return value;
 		};
-		this.setter = setter;
-		this.convertSetter = (bean, value) -> {
+		this.convertSetter = this.converter == null ? setter : (bean, value) -> {
 			if (value != null && this.converter != null) {
 				value = this.converter.convertToEntityAttribute(value);
 			}

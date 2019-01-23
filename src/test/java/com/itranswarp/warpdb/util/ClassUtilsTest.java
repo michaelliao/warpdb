@@ -13,7 +13,7 @@ public class ClassUtilsTest {
 	@Test
 	public void testScanInDir() throws Exception {
 		List<Class<?>> list = ClassUtils.scanEntities("com.itranswarp.warpdb.test");
-		assertEquals(5, list.size());
+		assertEquals(6, list.size());
 		for (Class<?> clazz : list) {
 			assertNotNull(clazz.getAnnotation(Entity.class));
 		}
