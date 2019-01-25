@@ -744,6 +744,16 @@ public class WarpDb {
 		return mapper;
 	}
 
+	/**
+	 * Get JdbcTemplate RowMapper for class type.
+	 * 
+	 * @param clazz The class type.
+	 * @return RowMapper object.
+	 */
+	public <T> RowMapper<T> getRowMapper(Class<T> clazz) {
+		return getMapper(clazz).rowMapper;
+	}
+
 	// get Mapper from SQL like "select * from abc where ..."
 	@SuppressWarnings("unchecked")
 	<T> Mapper<T> getMapper(String sql) {
