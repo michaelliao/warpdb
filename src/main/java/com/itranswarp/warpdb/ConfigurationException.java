@@ -7,7 +7,6 @@ import javax.persistence.PersistenceException;
  * 
  * @author liaoxuefeng
  */
-@SuppressWarnings("serial")
 public class ConfigurationException extends PersistenceException {
 
 	public ConfigurationException() {
