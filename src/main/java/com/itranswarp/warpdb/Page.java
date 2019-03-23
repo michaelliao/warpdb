@@ -12,11 +12,14 @@ public class Page {
 
 	public static final int DEFAULT_ITEMS_PER_PAGE = 20;
 
-	public final int pageIndex;
-	public final int itemsPerPage;
-	public final int totalPages;
-	public final int totalItems;
-	public final boolean isEmpty;
+	public int pageIndex;
+	public int itemsPerPage;
+	public int totalPages;
+	public int totalItems;
+	public boolean isEmpty;
+
+	public Page() {
+	}
 
 	public Page(int pageIndex, int itemsPerPage, int totalPages, int totalItems) {
 		this.pageIndex = pageIndex;

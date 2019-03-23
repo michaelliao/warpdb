@@ -13,9 +13,12 @@ import java.util.stream.Collectors;
  */
 public class PagedResults<T> {
 
-	public final Page page;
+	public Page page;
 
-	public final List<T> results;
+	public List<T> results;
+
+	public PagedResults() {
+	}
 
 	public PagedResults(Page page, List<T> results) {
 		this.page = page;
