@@ -145,7 +145,7 @@ public class WarpDb {
 
 	/**
 	 * Get a model instance by class type and ids. EntityNotFoundException is thrown
-	 * if not found.
+	 * if not found. NOTE ids are sorted by column names.
 	 * 
 	 * @param       <T> Generic type.
 	 * @param clazz Entity class.

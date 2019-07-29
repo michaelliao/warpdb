@@ -25,9 +25,9 @@ public class WarpDbCompositeIdTest extends WarpDbTestBase {
 
 	@Test
 	public void testQuery() throws Exception {
-		CompositeIdEntity c = warpdb.get(CompositeIdEntity.class, "u1", "s1");
+		CompositeIdEntity c = warpdb.get(CompositeIdEntity.class, "s1", "u1");
 		assertEquals("Mr 1", c.name);
-		assertNull(warpdb.fetch(CompositeIdEntity.class, "a", "b"));
+		assertNull(warpdb.fetch(CompositeIdEntity.class, "b", "a"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -68,7 +68,7 @@ public class WarpDbCompositeIdTest extends WarpDbTestBase {
 		c.balance = 2000;
 		warpdb.update(c);
 		// query:
-		c = warpdb.get(CompositeIdEntity.class, "u0", "s0");
+		c = warpdb.get(CompositeIdEntity.class, "s0", "u0");
 		assertEquals("Updated", c.name);
 		assertEquals(2000, c.balance);
 	}
