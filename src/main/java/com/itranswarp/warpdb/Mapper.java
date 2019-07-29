@@ -89,6 +89,8 @@ final class Mapper<T> {
 		// check @Id:
 		AccessibleProperty[] ids = all.stream().filter((p) -> {
 			return p.isId();
+		}).sorted((p1, p2) -> {
+			return p1.columnName.compareTo(p2.columnName);
 		}).toArray(AccessibleProperty[]::new);
 		if (ids.length == 0) {
 			throw new ConfigurationException("No @Id found.");

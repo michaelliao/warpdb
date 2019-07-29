@@ -5,7 +5,7 @@
 
 	<groupId>com.itranswarp</groupId>
 	<artifactId>warpdb</artifactId>
-	<version>4.3.2</version>
+	<version>4.3.3</version>
 	<packaging>jar</packaging>
 
 	<name>warpdb</name>
@@ -37,10 +37,10 @@
 	<properties>
 		<!-- source encoding -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<!-- project version -->
 		<project.version>1.0</project.version>
 		<!-- maven time format -->
@@ -51,7 +51,7 @@
 		<hsqldb.version>2.3.3</hsqldb.version>
 		<javax.annotation.version>1.2</javax.annotation.version>
 		<junit.version>4.12</junit.version>
-		<spring.version>5.1.2.RELEASE</spring.version>
+		<spring.version>5.1.7.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
@@ -74,6 +74,12 @@
 			<groupId>org.hibernate.javax.persistence</groupId>
 			<artifactId>hibernate-jpa-2.1-api</artifactId>
 			<version>1.0.0.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>c3p0</groupId>
