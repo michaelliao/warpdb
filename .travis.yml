@@ -1,7 +1,6 @@
 language: java
 
 jdk:
-  - oraclejdk8
+  - openjdk11
 
 install: mvn install -DskipTests=true -Dgpg.skip=true
-
