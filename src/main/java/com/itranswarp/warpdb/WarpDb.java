@@ -310,7 +310,7 @@ public class WarpDb {
 			return;
 		}
 		Mapper<?> mapper = getMapper(beans.iterator().next().getClass());
-		jdbcTemplate.execute(new ConnectionCallback<Object>() {
+		jdbcTemplate.execute(new ConnectionCallback<>() {
 			@Override
 			public Object doInConnection(Connection con) throws SQLException, DataAccessException {
 				try (PreparedStatement ps = con.prepareStatement(mapper.updateSQL)) {
@@ -423,7 +423,7 @@ public class WarpDb {
 		final String sql = ignore ? mapper.insertIgnoreSQL : mapper.insertSQL;
 		log.debug("SQL: " + sql);
 		try {
-			jdbcTemplate.execute(new ConnectionCallback<Object>() {
+			jdbcTemplate.execute(new ConnectionCallback<>() {
 				@Override
 				public Object doInConnection(Connection con) throws SQLException, DataAccessException {
 					try (PreparedStatement ps = mapper.ids[0].isIdentityId()
@@ -776,14 +776,14 @@ public class WarpDb {
 		throw new RuntimeException("Cannot parse entity name from SQL: " + sql);
 	}
 
-	static final RowMapper<Number> NUMBER_ROW_MAPPER = new RowMapper<Number>() {
+	static final RowMapper<Number> NUMBER_ROW_MAPPER = new RowMapper<>() {
 		@Override
 		public Number mapRow(ResultSet rs, int rowNum) throws SQLException {
 			return (Number) rs.getObject(1);
 		}
 	};
 
-	static final ResultSetExtractor<Number> NUMBER_RESULT_SET = new ResultSetExtractor<Number>() {
+	static final ResultSetExtractor<Number> NUMBER_RESULT_SET = new ResultSetExtractor<>() {
 		@Override
 		public Number extractData(ResultSet rs) throws SQLException, DataAccessException {
 			if (rs.next()) {

@@ -20,12 +20,20 @@ public class WarpQueryNumberTest extends WarpDbTestBase {
 			u.id = "A" + i;
 			u.name = "Mr " + i;
 			u.email = u.id.toLowerCase() + "@somewhere.org";
-			u.age = 20 + i;
-			u.score = 20 + i;
+			u.setAge(20 + i);
+			u.setScore(20 + i);
 			// tag = "A" or "B":
 			u.tag = i % 2 == 0 ? "A" : "B";
 			warpdb.insert(u);
 		}
+	}
+
+	@Test
+	public void testQueryScore() throws Exception {
+		User u = warpdb.fetch(User.class, "A0");
+		assertNotNull(u);
+		assertEquals(20, u.getAge());
+		assertEquals(20, u.getScore(), 0.0001);
 	}
 
 	@Test

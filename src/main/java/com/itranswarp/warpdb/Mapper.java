@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
@@ -392,15 +394,26 @@ final class Mapper<T> {
 	void addFieldPropertiesIncludeHierarchy(Class<?> clazz, List<AccessibleProperty> collector) {
 		List<AccessibleProperty> foundFields = Arrays.stream(clazz.getDeclaredFields()).filter((f) -> {
 			int mod = f.getModifiers();
-			// exclude @Transient:
-			if (f.isAnnotationPresent(Transient.class)) {
-				return false;
-			}
 			// exclude final, static:
 			if (Modifier.isFinal(mod) || Modifier.isStatic(mod)) {
 				return false;
 			}
-			return true;
+			// exclude @Transient:
+			if (Modifier.isPublic(mod) && f.isAnnotationPresent(Transient.class)) {
+				return false;
+			}
+			// exclude transient:
+			if (Modifier.isPublic(mod) && Modifier.isTransient(mod)) {
+				return false;
+			}
+			// include public:
+			if (Modifier.isPublic(mod)) {
+				return true;
+			}
+			if (f.isAnnotationPresent(Column.class) || f.isAnnotationPresent(Id.class)) {
+				return true;
+			}
+			return false;
 		}).map((f) -> {
 			return new AccessibleProperty(f);
 		}).collect(Collectors.toList());

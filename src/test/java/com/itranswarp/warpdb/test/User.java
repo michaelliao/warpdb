@@ -28,9 +28,25 @@ public class User extends BaseEntity {
 	@Column(length = 100, unique = true, nullable = false, updatable = false)
 	public String email;
 
-	public int age;
+	private int age;
 
-	public double score;
+	public int getAge() {
+		return this.age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	private double score;
+
+	public double getScore() {
+		return this.score;
+	}
+
+	public void setScore(double score) {
+		this.score = score;
+	}
 
 	@Transient
 	public String fullName;
