@@ -330,8 +330,13 @@ final class Mapper<T> {
 
 	String getTableName(Class<?> clazz) {
 		Table table = clazz.getAnnotation(Table.class);
-		if (table != null && !table.name().isEmpty()) {
-			return table.name();
+		if (table != null) {
+			String schema = table.schema();
+			String tableName = table.name();
+			if (tableName.isEmpty()) {
+				tableName = NameUtils.toCamelCaseName(clazz.getSimpleName());
+			}
+			return schema.isEmpty() ? tableName : schema + "." + tableName;
 		}
 		return NameUtils.toCamelCaseName(clazz.getSimpleName());
 	}
