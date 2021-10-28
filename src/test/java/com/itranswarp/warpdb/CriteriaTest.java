@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.itranswarp.warpdb.test.Publisher;
 import com.itranswarp.warpdb.test.User;
 
 public class CriteriaTest {
@@ -40,6 +41,11 @@ public class CriteriaTest {
 				warpdb.select().from(User.class).where("name = ?", "Bob").orderBy("name").orderBy("tag desc").sql());
 		assertEquals("SELECT * FROM user WHERE name = ? ORDER BY name DESC, the_tag ASC", warpdb.select()
 				.from(User.class).where("name = ?", "Bob").orderBy("name").desc().orderBy("tag asc").sql());
+	}
+
+	@Test
+	public void testWithSchema() {
+		assertEquals("SELECT * FROM default.publisher", warpdb.from(Publisher.class).sql());
 	}
 
 	@Test
