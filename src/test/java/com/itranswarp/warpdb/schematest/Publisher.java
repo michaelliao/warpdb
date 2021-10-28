@@ -1,4 +1,4 @@
-package com.itranswarp.warpdb.test;
+package com.itranswarp.warpdb.schematest;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
