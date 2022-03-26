@@ -109,8 +109,8 @@ final class Criteria<T> {
 	}
 
 	int count() {
-		String selectSql = sql("count(id)");
-		Object[] selectParams = params("count(id)");
+		String selectSql = sql("count(*)");
+		Object[] selectParams = params("count(*)");
 		return warpdb.queryForInt(selectSql, selectParams).getAsInt();
 	}
 
