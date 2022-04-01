@@ -3,7 +3,7 @@
 
 	<groupId>com.itranswarp</groupId>
 	<artifactId>warpdb</artifactId>
-	<version>5.0.2</version>
+	<version>5.0.3</version>
 	<packaging>jar</packaging>
 
 	<name>warpdb</name>
@@ -49,7 +49,7 @@
 		<javax.annotation.version>1.2</javax.annotation.version>
 		<junit.version>4.13.1</junit.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<spring.version>5.1.9.RELEASE</spring.version>
+		<spring.version>5.3.18</spring.version>
 	</properties>
 
 	<dependencies>
