@@ -90,8 +90,8 @@ final class Criteria<T> {
 		if (itemsPerPage < 1 || itemsPerPage > 1000) {
 			throw new IllegalArgumentException("Invalid items per page.");
 		}
-		String countSql = sql("count(id)");
-		Object[] countParams = params("count(id)");
+		String countSql = sql("count(*)");
+		Object[] countParams = params("count(*)");
 		int totalItems = warpdb.queryForInt(countSql, countParams).getAsInt();
 		int totalPages = 0;
 		if (totalItems > 0) {

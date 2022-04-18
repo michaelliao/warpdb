@@ -88,7 +88,7 @@ public class WarpQueryNumberTest extends WarpDbTestBase {
 	@Test
 	public void testQueryForNumberPresent() throws Exception {
 		warpdb.updateSql("delete from User");
-		Optional<Number> n = warpdb.queryForNumber("select count(id) from User");
+		Optional<Number> n = warpdb.queryForNumber("select count(*) from User");
 		assertTrue(n.isPresent());
 		assertEquals(0, n.get().intValue());
 	}
