@@ -45,7 +45,7 @@
 		<maven.build.timestamp.format>yyyyMMdd_HHmmss</maven.build.timestamp.format>
 		<!-- artifact version -->
 		<c3p0.version>0.9.1.2</c3p0.version>
-		<hsqldb.version>2.3.3</hsqldb.version>
+		<hsqldb.version>2.7.0</hsqldb.version>
 		<javax.annotation.version>1.2</javax.annotation.version>
 		<junit.version>4.13.1</junit.version>
 		<slf4j.version>1.7.25</slf4j.version>
