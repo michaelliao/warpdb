@@ -3,11 +3,11 @@ package com.itranswarp.warpdb.test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import com.itranswarp.warpdb.converter.LocalDateConverter;
 import com.itranswarp.warpdb.converter.LocalDateTimeConverter;

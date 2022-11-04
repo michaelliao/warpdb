@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 /**
  * Built-in converter to store Java LocalDateTime type to database DATETIME

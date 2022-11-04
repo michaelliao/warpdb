@@ -1,17 +1,19 @@
 package com.itranswarp.warpdb;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.itranswarp.warpdb.test.User;
 
 public class WarpDbQueryTest extends WarpDbTestBase {
 
-    @Before
+    @BeforeEach
     public void prepareData() {
         String[] ids = { "A0", "A1", "A2", "A3", "A4", "B0", "B1", "B2", "B3", "B4" };
         for (String id : ids) {
@@ -98,8 +100,10 @@ public class WarpDbQueryTest extends WarpDbTestBase {
         assertEquals(0, warpdb.from(User.class).where("id=?", "X").count());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBadWhereClause() {
-        warpdb.select().from(User.class).where("id>? or id<?", "A3").list();
+        assertThrows(IllegalArgumentException.class, () -> {
+            warpdb.select().from(User.class).where("id>? or id<?", "A3").list();
+        });
     }
 }

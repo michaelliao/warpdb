@@ -1,8 +1,10 @@
 package com.itranswarp.warpdb;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.itranswarp.warpdb.invalid.dupcol.DupColNameEntity;
 import com.itranswarp.warpdb.invalid.dupprop.DupPropNameEntity;
@@ -14,52 +16,66 @@ import com.itranswarp.warpdb.invalid.multiversion.MultiVersionEntity;
 
 public class WarpDbConfigTest {
 
-	@Test(expected = ConfigurationException.class)
-	public void testInvalidForMissingId() {
-		WarpDb warpdb = new WarpDb();
-		warpdb.basePackages = Arrays.asList(MissingIdEntity.class.getPackage().getName());
-		warpdb.init();
-	}
+    @Test
+    public void testInvalidForMissingId() {
+        WarpDb warpdb = new WarpDb();
+        warpdb.basePackages = Arrays.asList(MissingIdEntity.class.getPackage().getName());
+        assertThrows(ConfigurationException.class, () -> {
+            warpdb.init();
+        });
+    }
 
-	@Test(expected = ConfigurationException.class)
-	public void testInvalidForMultiId() {
-		WarpDb warpdb = new WarpDb();
-		warpdb.basePackages = Arrays.asList(MultiIdEntity.class.getPackage().getName());
-		warpdb.init();
-	}
+    @Test
+    public void testInvalidForMultiId() {
+        WarpDb warpdb = new WarpDb();
+        warpdb.basePackages = Arrays.asList(MultiIdEntity.class.getPackage().getName());
+        assertThrows(ConfigurationException.class, () -> {
+            warpdb.init();
+        });
+    }
 
-	@Test(expected = ConfigurationException.class)
-	public void testInvalidForMultiVersion() {
-		WarpDb warpdb = new WarpDb();
-		warpdb.basePackages = Arrays.asList(MultiVersionEntity.class.getPackage().getName());
-		warpdb.init();
-	}
+    @Test
+    public void testInvalidForMultiVersion() {
+        WarpDb warpdb = new WarpDb();
+        warpdb.basePackages = Arrays.asList(MultiVersionEntity.class.getPackage().getName());
+        assertThrows(ConfigurationException.class, () -> {
+            warpdb.init();
+        });
+    }
 
-	@Test(expected = ConfigurationException.class)
-	public void testInvalidForDuplicatePropertyName() {
-		WarpDb warpdb = new WarpDb();
-		warpdb.basePackages = Arrays.asList(DupPropNameEntity.class.getPackage().getName());
-		warpdb.init();
-	}
+    @Test
+    public void testInvalidForDuplicatePropertyName() {
+        WarpDb warpdb = new WarpDb();
+        warpdb.basePackages = Arrays.asList(DupPropNameEntity.class.getPackage().getName());
+        assertThrows(ConfigurationException.class, () -> {
+            warpdb.init();
+        });
+    }
 
-	@Test(expected = ConfigurationException.class)
-	public void testInvalidForDuplicateColumnName() {
-		WarpDb warpdb = new WarpDb();
-		warpdb.basePackages = Arrays.asList(DupColNameEntity.class.getPackage().getName());
-		warpdb.init();
-	}
+    @Test
+    public void testInvalidForDuplicateColumnName() {
+        WarpDb warpdb = new WarpDb();
+        warpdb.basePackages = Arrays.asList(DupColNameEntity.class.getPackage().getName());
+        assertThrows(ConfigurationException.class, () -> {
+            warpdb.init();
+        });
+    }
 
-	@Test(expected = ConfigurationException.class)
-	public void testInvalidForDuplicateTableName() {
-		WarpDb warpdb = new WarpDb();
-		warpdb.basePackages = Arrays.asList(DupTableNameEntity.class.getPackage().getName());
-		warpdb.init();
-	}
+    @Test
+    public void testInvalidForDuplicateTableName() {
+        WarpDb warpdb = new WarpDb();
+        warpdb.basePackages = Arrays.asList(DupTableNameEntity.class.getPackage().getName());
+        assertThrows(ConfigurationException.class, () -> {
+            warpdb.init();
+        });
+    }
 
-	@Test(expected = ConfigurationException.class)
-	public void testInvalidForMultiPreUpdate() {
-		WarpDb warpdb = new WarpDb();
-		warpdb.basePackages = Arrays.asList(MultiPreUpdateEntity.class.getPackage().getName());
-		warpdb.init();
-	}
+    @Test
+    public void testInvalidForMultiPreUpdate() {
+        WarpDb warpdb = new WarpDb();
+        warpdb.basePackages = Arrays.asList(MultiPreUpdateEntity.class.getPackage().getName());
+        assertThrows(ConfigurationException.class, () -> {
+            warpdb.init();
+        });
+    }
 }

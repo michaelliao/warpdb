@@ -9,18 +9,17 @@ package com.itranswarp.warpdb;
  */
 abstract class CriteriaQuery<T> {
 
-	protected final Criteria<T> criteria;
+    protected final Criteria<T> criteria;
 
-	CriteriaQuery(Criteria<T> criteria) {
-		this.criteria = criteria;
-	}
+    CriteriaQuery(Criteria<T> criteria) {
+        this.criteria = criteria;
+    }
 
-	String sql() {
-		return criteria.sql(null);
-	}
+    String sql() {
+        return criteria.sql(null);
+    }
 
-	String sql(String aggregate) {
-		return criteria.sql(aggregate);
-	}
-
+    String sql(String aggregate) {
+        return criteria.sql(aggregate);
+    }
 }

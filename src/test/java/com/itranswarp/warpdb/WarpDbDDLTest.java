@@ -1,12 +1,11 @@
 package com.itranswarp.warpdb;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class WarpDbDDLTest extends WarpDbTestBase {
 
-	@Test
-	public void testDDL() throws Exception {
-		System.out.println(warpdb.getDDL());
-	}
-
+    @Test
+    public void testDDL() throws Exception {
+        System.out.println(warpdb.getDDL());
+    }
 }

@@ -18,12 +18,12 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.function.Function;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.PersistenceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +37,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import com.itranswarp.warpdb.util.ClassUtils;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * A lightweight Spring-JdbcTemplate wrapper using DSL-style operation.
@@ -150,7 +152,7 @@ public class WarpDb {
      * @param id    Id value.
      * @return Entity bean found by id.
      */
-    public <T> T get(Class<T> clazz, Serializable... ids) {
+    public <T> T get(Class<T> clazz, Object... ids) {
         T t = fetch(clazz, ids);
         if (t == null) {
             throw new EntityNotFoundException(clazz.getSimpleName());
@@ -166,7 +168,7 @@ public class WarpDb {
      * @param id    Id value.
      * @return Entity bean found by id.
      */
-    public <T> T fetch(Class<T> clazz, Serializable id) {
+    public <T> T fetch(Class<T> clazz, Object id) {
         Mapper<T> mapper = getMapper(clazz);
         if (mapper.ids.length != 1) {
             throw new IllegalArgumentException(mapper.ids.length + " id values are expected but actual 1.");
@@ -174,7 +176,7 @@ public class WarpDb {
         if (logger.isDebugEnabled()) {
             logger.debug("SQL: {}", mapper.selectSQL);
         }
-        List<T> list = (List<T>) jdbcTemplate.query(mapper.selectSQL, new Object[] { id }, mapper.rowMapper);
+        List<T> list = jdbcTemplate.query(mapper.selectSQL, mapper.rowMapper, id);
         if (list.isEmpty()) {
             return null;
         }
@@ -195,7 +197,7 @@ public class WarpDb {
      * @param ids   Id values.
      * @return Entity bean found by id.
      */
-    public <T> T fetch(Class<T> clazz, Serializable... ids) {
+    public <T> T fetch(Class<T> clazz, Object... ids) {
         Mapper<T> mapper = getMapper(clazz);
         if (mapper.ids.length != ids.length) {
             throw new IllegalArgumentException(mapper.ids.length + " id values are expected but actual " + ids.length + ".");
@@ -203,7 +205,7 @@ public class WarpDb {
         if (logger.isDebugEnabled()) {
             logger.debug("SQL: {}", mapper.selectSQL);
         }
-        List<T> list = (List<T>) jdbcTemplate.query(mapper.selectSQL, ids, mapper.rowMapper);
+        List<T> list = jdbcTemplate.query(mapper.selectSQL, mapper.rowMapper, ids);
         if (list.isEmpty()) {
             return null;
         }
@@ -578,7 +580,7 @@ public class WarpDb {
             logger.debug("SQL: {}", sql);
         }
         Mapper<T> mapper = getMapper(sql);
-        List<T> list = (List<T>) jdbcTemplate.query(sql, args, mapper.rowMapper);
+        List<T> list = jdbcTemplate.query(sql, mapper.rowMapper, args);
         try {
             for (T bean : list) {
                 mapper.postLoad.invoke(bean);
@@ -603,7 +605,7 @@ public class WarpDb {
             logger.debug("SQL: {}", sql);
         }
         Mapper<T> mapper = getMapper(clazz);
-        List<T> list = (List<T>) jdbcTemplate.query(sql, args, mapper.rowMapper);
+        List<T> list = jdbcTemplate.query(sql, mapper.rowMapper, args);
         try {
             for (T bean : list) {
                 mapper.postLoad.invoke(bean);
@@ -626,14 +628,14 @@ public class WarpDb {
         if (logger.isDebugEnabled()) {
             logger.debug("SQL: {}", sql);
         }
-        return jdbcTemplate.query(sql, args, rowMapper);
+        return jdbcTemplate.query(sql, rowMapper, args);
     }
 
     public Optional<Number> queryForNumber(String sql, Object... args) {
         if (logger.isDebugEnabled()) {
             logger.debug("SQL: {}", sql);
         }
-        Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
+        Number number = jdbcTemplate.query(sql, NUMBER_RESULT_SET, args);
         return Optional.ofNullable(number);
     }
 
@@ -641,7 +643,7 @@ public class WarpDb {
         if (logger.isDebugEnabled()) {
             logger.debug("SQL: {}", sql);
         }
-        Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
+        Number number = jdbcTemplate.query(sql, NUMBER_RESULT_SET, args);
         if (number == null) {
             return OptionalLong.empty();
         }
@@ -652,7 +654,7 @@ public class WarpDb {
         if (logger.isDebugEnabled()) {
             logger.debug("SQL: {}", sql);
         }
-        Number number = jdbcTemplate.query(sql, args, NUMBER_RESULT_SET);
+        Number number = jdbcTemplate.query(sql, NUMBER_RESULT_SET, args);
         if (number == null) {
             return OptionalInt.empty();
         }
@@ -864,5 +866,4 @@ class BeanRowMapper<T> implements RowMapper<T> {
         }
         return bean;
     }
-
 }

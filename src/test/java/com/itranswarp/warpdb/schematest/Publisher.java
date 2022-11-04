@@ -1,15 +1,15 @@
 package com.itranswarp.warpdb.schematest;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(schema = "default")
 public class Publisher {
 
-	@Id
-	public String id;
+    @Id
+    public String id;
 
-	public String name;
+    public String name;
 }

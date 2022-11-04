@@ -14,7 +14,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 /**
  * Create a in-memory hsqldb and return JdbcTemplate.
  * 
- * @author michael
+ * @author liaoxuefeng
  */
 public class JdbcTemplateHsqldbFactory {
 

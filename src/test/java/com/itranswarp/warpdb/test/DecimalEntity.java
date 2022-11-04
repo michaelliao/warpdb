@@ -2,8 +2,8 @@ package com.itranswarp.warpdb.test;
 
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 
 @Entity
 public class DecimalEntity extends BaseEntity {

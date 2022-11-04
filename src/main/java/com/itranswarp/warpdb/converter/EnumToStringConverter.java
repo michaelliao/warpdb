@@ -1,6 +1,6 @@
 package com.itranswarp.warpdb.converter;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 /**
  * Built-in converter to store Java enum type as VARCHAR in database.
