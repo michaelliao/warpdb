@@ -30,9 +30,11 @@ Maven dependency:
 <dependency>
     <groupId>com.itranswarp</groupId>
     <artifactId>warpdb</artifactId>
-    <version>5.0.4</version>
+    <version>${warpdb.version}</version>
 </dependency>
 ```
+
+Use 5.0.4 for Spring 5.x and 6.0.0 for Spring 6.x.
 
 Warpdb is built on top of Spring-JDBC. JdbcTemplate or DataSource is required when build warpdb instance:
 
