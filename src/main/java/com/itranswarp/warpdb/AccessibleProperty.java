@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -105,20 +106,44 @@ class AccessibleProperty {
         return col == null || col.updatable();
     }
 
+    static PropertySetter createPropertySetter(Field f) {
+        if (f.getType() == Long.class || f.getType() == long.class) {
+            return (obj, value) -> {
+                if (value instanceof BigInteger) {
+                    value = ((BigInteger) value).longValue();
+                }
+                f.set(obj, value);
+            };
+        }
+        return (obj, value) -> {
+            f.set(obj, value);
+        };
+    }
+
+    static PropertySetter createPropertySetter(Method setter) {
+        if (setter.getParameterTypes()[0] == Long.class || setter.getParameterTypes()[0] == long.class) {
+            return (obj, value) -> {
+                if (value instanceof BigInteger) {
+                    value = ((BigInteger) value).longValue();
+                }
+                setter.invoke(obj, value);
+            };
+        }
+        return (obj, value) -> {
+            setter.invoke(obj, value);
+        };
+    }
+
     public AccessibleProperty(Field f) {
         this(f.getType(), f.getName(), f, (obj) -> {
             return f.get(obj);
-        }, (obj, value) -> {
-            f.set(obj, value);
-        });
+        }, createPropertySetter(f));
     }
 
     public AccessibleProperty(String name, Method getter, Method setter) {
         this(getter.getReturnType(), name, getter, (obj) -> {
             return getter.invoke(obj);
-        }, (obj, value) -> {
-            setter.invoke(obj, value);
-        });
+        }, createPropertySetter(setter));
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

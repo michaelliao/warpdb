@@ -20,7 +20,7 @@ DSL-driven RDBMS interface for Java:
 
 ### Database Support
 
-* MySQL 5.x
+* MySQL 5.x/8.x
 
 ### Configuration
 
@@ -34,7 +34,7 @@ Maven dependency:
 </dependency>
 ```
 
-Use 5.0.4 for Spring 5.x and 6.0.0 for Spring 6.x.
+Use 5.x for Spring 5.x and 6.x for Spring 6.x.
 
 Warpdb is built on top of Spring-JDBC. JdbcTemplate or DataSource is required when build warpdb instance:
 
