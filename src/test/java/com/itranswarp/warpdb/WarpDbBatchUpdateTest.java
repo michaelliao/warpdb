@@ -18,6 +18,7 @@ public class WarpDbBatchUpdateTest extends WarpDbTestBase {
         User[] users = new User[27];
         for (int i = 0; i < users.length; i++) {
             User user = new User();
+            user.setAge(10 + i);
             user.name = "Name-" + i;
             user.email = "name" + i + "@somewhere.org";
             users[i] = user;
@@ -26,6 +27,7 @@ public class WarpDbBatchUpdateTest extends WarpDbTestBase {
         long ts = System.currentTimeMillis();
         for (int i = 0; i < users.length; i++) {
             User user = users[i];
+            assertEquals(10 + i, user.getAge());
             assertEquals(String.format("%04d", i + 1), user.id);
             assertEquals(user.createdAt, user.updatedAt);
             assertEquals(ts, user.createdAt, 500.0);
@@ -34,6 +36,7 @@ public class WarpDbBatchUpdateTest extends WarpDbTestBase {
         // update:
         for (int i = 0; i < users.length; i++) {
             User user = users[i];
+            user.setAge(20 + i);
             user.name = "Updated-" + i;
             user.email = "updated" + i + "@new.org";
         }
@@ -44,6 +47,7 @@ public class WarpDbBatchUpdateTest extends WarpDbTestBase {
         for (int i = 0; i < us.size(); i++) {
             User user = us.get(i);
             assertEquals(String.format("%04d", i + 1), user.id);
+            assertEquals(20 + i, user.getAge());
             assertEquals("Updated-" + i, user.name);
             assertEquals("name" + i + "@somewhere.org", user.email); // not updated
             assertNotEquals(user.createdAt, user.updatedAt);

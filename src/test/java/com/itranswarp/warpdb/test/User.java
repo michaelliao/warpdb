@@ -28,6 +28,7 @@ public class User extends BaseEntity {
 	@Column(length = 100, unique = true, nullable = false, updatable = false)
 	public String email;
 
+	@Column(nullable = false)
 	private int age;
 
 	public int getAge() {

@@ -336,6 +336,7 @@ final class Mapper<T> {
     List<AccessibleProperty> getPropertiesIncludeHierarchy(Class<?> clazz) {
         List<AccessibleProperty> properties = new ArrayList<>();
         addFieldPropertiesIncludeHierarchy(clazz, properties);
+        Set<String> fieldNames = properties.stream().map(ap -> ap.propertyName).collect(Collectors.toSet());
         // find methods:
         List<AccessibleProperty> foundMethods = Arrays.stream(clazz.getMethods()).filter((m) -> {
             int mod = m.getModifiers();
@@ -355,22 +356,29 @@ final class Mapper<T> {
             if (m.getParameterTypes().length > 0) {
                 return false;
             }
+            boolean isGetter = false;
             if (m.getName().startsWith("get") && m.getName().length() >= 4) {
-                return true;
+                isGetter = true;
             }
             if (m.getName().startsWith("is") && m.getName().length() >= 3 && (m.getReturnType() == boolean.class || m.getReturnType() == Boolean.class)) {
+                isGetter = true;
+            }
+            if (isGetter) {
+                String name = getGetterName(m.getName());
+                // if annotation already set on field:
+                if (fieldNames.contains(name)) {
+                    // and getter has no annotation:
+                    if (!m.isAnnotationPresent(Column.class) && !m.isAnnotationPresent(Id.class)) {
+                        // skip this getter:
+                        return false;
+                    }
+                }
                 return true;
             }
             return false;
         }).map((getter) -> {
             Class<?> type = getter.getReturnType();
-            String name;
-            if (getter.getName().startsWith("get")) {
-                name = Character.toLowerCase(getter.getName().charAt(3)) + getter.getName().substring(4);
-            } else {
-                // isXxx()
-                name = Character.toLowerCase(getter.getName().charAt(2)) + getter.getName().substring(3);
-            }
+            String name = getGetterName(getter.getName());
             // find setter:
             String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
             Method setter;
@@ -385,6 +393,16 @@ final class Mapper<T> {
         }).collect(Collectors.toList());
         properties.addAll(foundMethods);
         return properties;
+    }
+
+    String getGetterName(String name) {
+        if (name.startsWith("get")) {
+            return Character.toLowerCase(name.charAt(3)) + name.substring(4);
+        } else if (name.startsWith("is")) {
+            return Character.toLowerCase(name.charAt(2)) + name.substring(3);
+        } else {
+            throw new IllegalArgumentException("Invalid getter name: " + name);
+        }
     }
 
     void addFieldPropertiesIncludeHierarchy(Class<?> clazz, List<AccessibleProperty> collector) {
