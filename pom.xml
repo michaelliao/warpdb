@@ -3,7 +3,7 @@
 
 	<groupId>com.itranswarp</groupId>
 	<artifactId>warpdb</artifactId>
-	<version>6.0.1</version>
+	<version>6.0.2</version>
 	<packaging>jar</packaging>
 
 	<name>warpdb</name>
