@@ -6,9 +6,7 @@ DSL-driven RDBMS interface for Java:
 
 # Status:
 
-[![Maven Status](https://maven-badges.herokuapp.com/maven-central/com.itranswarp/warpdb/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.itranswarp/warpdb)
-
-![Github Workflow](https://github.com/michaelliao/warpdb/actions/workflows/maven.yml/badge.svg)
+![Maven Central](https://img.shields.io/maven-central/v/com.itranswarp/warpdb) ![Github Workflow](https://github.com/michaelliao/warpdb/actions/workflows/maven.yml/badge.svg)
 
 ### Design principles
 
