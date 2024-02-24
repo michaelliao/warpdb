@@ -138,7 +138,7 @@ public final class Where<T> extends CriteriaQuery<T> {
      * @return T modelInstance
      * @throws jakarta.persistence.NoResultException        If result set is empty.
      * @throws jakarta.persistence.NonUniqueResultException If more than 1 results
-     *                                                    found.
+     *                                                      found.
      */
     public T unique() {
         return this.criteria.unique();
@@ -149,7 +149,7 @@ class CompiledClause {
 
     static final Map<String, CompiledClause> CACHE = new ConcurrentHashMap<>();
 
-    static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList("and", "or", "like", "in", "is", "not"));
+    static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList("and", "or", "like", "is", "not"));
 
     static final Pattern p = Pattern.compile("[a-z\\_][a-z0-9\\_]*");
 
@@ -181,17 +181,18 @@ class CompiledClause {
         while (m.find()) {
             sb.append(clause.substring(start, m.start()));
             String s = clause.substring(m.start(), m.end());
-            if (properties.containsKey(s.toLowerCase())) {
-                AccessibleProperty ap = properties.get(s.toLowerCase());
+            String sl = s.toLowerCase();
+            if (properties.containsKey(sl)) {
+                AccessibleProperty ap = properties.get(sl);
                 sb.append(ap.columnName);
                 list.add(ap.converter);
             } else {
-                if (s.toLowerCase().equals("between")) {
+                if (sl.equals("between")) {
                     list.add(list.get(list.size() - 1));
-                } else if (s.toLowerCase().equals("null")) {
+                } else if (sl.equals("null")) {
                     list.remove(list.size() - 1);
                 } else {
-                    if (!KEYWORDS.contains(s.toLowerCase())) {
+                    if (!KEYWORDS.contains(sl)) {
                         throw new IllegalArgumentException("Invalid string \"" + s + "\" found in clause: " + clause);
                     }
                 }

@@ -94,6 +94,18 @@ public class WarpDbQueryTest extends WarpDbTestBase {
     }
 
     @Test
+    public void testQuery6() throws Exception {
+        List<User> list1 = warpdb.select().from(User.class).where("id is NULL").list();
+        assertEquals(0, list1.size());
+    }
+
+    @Test
+    public void testQuery7() throws Exception {
+        List<User> list1 = warpdb.select().from(User.class).where("id is NOT NULL").list();
+        assertEquals(10, list1.size());
+    }
+
+    @Test
     public void testCount() throws Exception {
         assertEquals(10, warpdb.from(User.class).count());
         assertEquals(2, warpdb.from(User.class).where("id>=?", "B3").count());
