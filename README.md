@@ -1,26 +1,30 @@
-# warpdb
+# WarpDB Overview
 
-DSL-driven RDBMS interface for Java:
+WarpDB is a lightweight Object-Relational Mapping (ORM) framework designed to provide a simple, fluent, and type-safe interface for Java applications to interact with relational databases. It aims to reduce the complexity often associated with database operations while maintaining flexibility for developers.
 
 ![DEMO](https://github.com/michaelliao/warpdb/raw/master/warpdb.gif)
 
-# Status:
+# Status
 
 ![Maven Central](https://img.shields.io/maven-central/v/com.itranswarp/warpdb) ![Github Workflow](https://github.com/michaelliao/warpdb/actions/workflows/maven.yml/badge.svg)
 
-### Design principles
+# Design Philosophy
 
-* JPA-annotation based configuration.
-* DSL-style API reads like English.
-* Support raw SQL for very complex query.
-* No "attach/dettach".
-* All entities are simple POJOs without proxy-ing.
+WarpDB follows several core design principles that differentiate it from other ORM frameworks:
 
-### Database Support
+- JPA-annotation based configuration: Uses standard Jakarta Persistence API annotations for entity mapping;
+- DSL-style API: Provides a fluent query interface that reads like English;
+- Raw SQL support: Allows for direct SQL queries when needed for complex operations;
+- Simple POJO entities: All entities are plain Java objects without proxying;
+- No "attach/detach" lifecycle: Simplified entity management without complex state tracking.
+
+These principles guide the development of WarpDB to create a framework that is both powerful and easy to use.
+
+# Database Support
 
 * MySQL 5.x/8.x
 
-### Configuration
+# Configuration
 
 Maven dependency:
 
